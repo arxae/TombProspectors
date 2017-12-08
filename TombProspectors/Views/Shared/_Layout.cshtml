@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Tomb Prospectors - @ViewBag.Title</title>
+	<link href="~/lib/uikit/css/uikit.min.css" rel="stylesheet" />
+	<link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
+	
+	@RenderSection("Head", false)
+</head>
+
+<body>
+	<div class="uk-container">
+		@*<h1>
+				<a href="/" class="uk-link-reset">Tomb Prospectors</a>
+				|
+				<a href="/" class="uk-button uk-button-text">Home</a>
+				<a href="#" class="uk-button uk-button-text">New glyph</a>
+				|
+
+			</h1>*@
+
+		<nav class="uk-navbar-container uk-margin" uk-navbar>
+			<div class="uk-navbar-left">
+
+				<a class="uk-navbar-item uk-logo" href="/">Tomb Prospectors</a>
+
+				<div class="uk-navbar-item">
+					<div><a href="/dungeon/addglyph" class="uk-button uk-button-text">New Glyph</a></div>
+				</div>
+			</div>
+
+			<div class="uk-navbar-right">
+				<div class="uk-navbar-item">
+					<button class="uk-button uk-button-default" style="margin-right:1%">Search</button>
+					<form class="uk-search uk-search-default">
+						<span class="uk-search-icon-flip" uk-search-icon></span>
+						<input class="uk-search-input" type="search" placeholder="Search...">
+					</form>
+				</div>
+			</div>
+		</nav>
+
+		@RenderBody()
+	</div>
+
+	<script type="text/javascript" src="~/js/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="~/lib/uikit/js/uikit.min.js"></script>
+	<script type="text/javascript" src="~/lib/uikit/js/uikit-icons.min.js"></script>
+	<script type="text/javascript" src="~/lib/select2/js/select2.min.js"></script>
+	<script type="text/javascript" src="~/dist/app.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$(".combobox").select2();
+		});
+	</script>
+
+	@RenderSection("Script", false)
+</body>
+
+</html>

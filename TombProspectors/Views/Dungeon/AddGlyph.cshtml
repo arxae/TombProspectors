@@ -1,0 +1,78 @@
+﻿@model TombProspectors.Controllers.DungeonController.AddGlyphModel
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "Submit new glyph";
+}
+
+<form action="/api/SubmitNewGlyph" method="post">
+	<fieldset class="uk-fieldset">
+		<legend class="uk-legend">Submit new glyph</legend>
+
+		<div class="uk-margin">
+			<label for="dungeonGlyph">Dungeon Glyph</label>
+			<input name="DungeonGlyph" id="dungeonGlyph" class="uk-input" type="text" placeholder="Dungeon Glyph" />
+		</div>
+
+		<div class="uk-margin">
+			<label for="rootChaliceSelect">Root Chalice</label>
+			<select name="RootChalice" id="rootChaliceSelect" class="uk-select combobox">
+				@foreach (var chalice in Model.RootChalices)
+				{
+					<option value="@chalice.ChaliceId">@chalice.ChaliceName</option>
+				}
+			</select>
+		</div>
+
+
+		<label for="addRitesCheckboxes">Additional Rites</label>
+		<div id="addRitesCheckboxes" class="uk-grid-small uk-child-width-auto uk-grid">
+			<label>@Html.CheckBox("Fetid", false, new { @class = "uk-checkbox" }) Fetid</label>
+			<label>@Html.CheckBox("Rotted", false, new { @class = "uk-checkbox" }) Rotted</label>
+			<label>@Html.CheckBox("Cursed", false, new { @class = "uk-checkbox" }) Cursed</label>
+		</div>
+
+		<div class="uk-margin">
+			<label for="dungeonBoss">Dungeon Boss(es)</label>
+			<select name="Bosses" id="dungeonBoss" class="combobox" multiple style="width:100%">
+				@foreach (var boss in Model.Bosses)
+				{
+					<option value="@boss.Id">@boss.BossName</option>
+				}
+			</select>
+		</div>
+
+		<div class="uk-margin">
+			<label for="dungeonLoot">Notable Loot</label>
+			<select name="Loot" id="dungeonLoot" class="cmb2" multiple style="width: 100%">
+				@foreach (var loot in Model.Loot)
+				{
+					<option value="@loot.Id">@loot.ItemName</option>
+				}
+			</select>
+		</div>
+
+		<div class="uk-margin">
+			<label for="notesArea">Extra notes</label>
+			<textarea name="Notes" id="notesArea" class="uk-textarea"></textarea>
+		</div>
+	</fieldset>
+
+	<input type="submit" class="uk-button uk-button-primary" />
+	<input type="reset" id="resetBtn" class="uk-button uk-button-danger" />
+</form>
+
+@section Script {
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$(".cmb2").select2({
+				tags: true
+			});
+		});
+
+		$("#resetBtn").on("click",
+			function () {
+				$(".combobox").val(null).trigger("change");
+				$(".cmb2").val(null).trigger("change");
+			});
+	</script>
+}

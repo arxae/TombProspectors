@@ -1,0 +1,69 @@
+﻿@model TombProspectors.Controllers.DungeonController.ViewGlyphModel
+
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "View Glyph: " + Model.Dungeon.Glyph;
+}
+
+@section Head {
+	<style>
+		.wikiLink {
+			color: lightgrey
+		}
+	</style>
+}
+
+<article class="uk-article">
+	<h1 class="uk-article-title">Viewing Glyph: @Model.Dungeon.Glyph</h1>
+
+	<ul class="uk-list uk-list-divider">
+		<li>Root Chalice: @Model.Dungeon.RootChalice</li>
+
+		<li>
+			Bosses:
+			<ul>
+				@foreach (var boss in Model.Bosses)
+				{
+					<li>
+						@boss.BossName
+
+						@if (boss.WikiLink != null)
+						{
+							<a href="@boss.WikiLink" class="uk-button uk-button-text wikiLink" target="_blank">(W)</a>
+						}
+					</li>
+				}
+			</ul>
+		</li>
+
+		<li>
+			Loot:
+			<ul>
+				@foreach (var loot in Model.Loot)
+				{
+					<li>
+						@loot.ItemName
+
+						@if (loot.WikiLink != null)
+						{
+							<a href="@loot.WikiLink" class="uk-button uk-button-text wikiLink" target="_blank">(W)</a>
+						}
+
+					</li>
+				}
+			</ul>
+		</li>
+	</ul>
+
+	<label>@Html.CheckBoxFor(m => m.Dungeon.Fetid, new { @class = "uk-checkbox", onclick = "return false;" }) Fetid</label>
+	<label>@Html.CheckBoxFor(m => m.Dungeon.Rotted, new { @class = "uk-checkbox", onclick = "return false;" }) Rotted</label>
+	<label>@Html.CheckBoxFor(m => m.Dungeon.Cursed, new { @class = "uk-checkbox", onclick = "return false;" }) Cursed</label>
+
+	<p>
+		Notes:
+		@Html.TextAreaFor(m => m.Dungeon.Notes, new { @class = "uk-textarea", @readonly = "readonly" })
+	</p>
+
+	<hr />
+	<p class="uk-article-meta">Submitted on @Model.Dungeon.Updated</p>
+</article>
