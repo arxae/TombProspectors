@@ -1,3 +1,31 @@
-﻿@{
+﻿@model TombProspectors.Controllers.HomeController.HomeViewStats
+@{
+	ViewBag.Title = "Keep on diggin'";
 	Layout = "_Layout";
 }
+
+<div class="ui segment">
+	@*<div class="ui left rail">
+			<div class="ui segment">
+				Left Rail Content
+			</div>
+		</div>*@
+	<div class="ui right close rail">
+		<div class="ui segment">
+			<div class="ui message">
+				<div class="header">Latest Glyph: <a href="/dungeon/viewglyph/@Model.LatestGlyph">@Model.LatestGlyph</a></div>
+			</div>
+
+			<div class="ui message">
+				<div class="header">Most Submissions</div>
+				@if (Model.MostSubmissions != null)
+				{
+					<p>@Model.MostSubmissions.Item1 with @Model.MostSubmissions.Item2 glyphs</p>
+				}
+			</div>
+		</div>
+	</div>
+	<div>
+		<h1 class="ui header">Tomb Prospectors <sub><small>(test)</small></sub></h1>
+	</div>
+</div>

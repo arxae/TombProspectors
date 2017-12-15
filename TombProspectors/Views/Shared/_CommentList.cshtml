@@ -1,0 +1,74 @@
+﻿@model TombProspectors.Controllers.DungeonController.CommentsViewModel
+
+<div class="ui comments">
+	@if (Model.Comments.Count > 0)
+	{
+		foreach (var comment in Model.Comments)
+		{
+			<div class="comment">
+				<a class="avatar">
+					<img src="http://placekitten.com/g/128/128">
+				</a>
+				<div class="content">
+					<a class="author">@comment.PostedBy</a>
+					<div class="metadata">
+						<span class="date">@comment.Posted</span>
+					</div>
+					<div class="text markdown">@comment.CommentText</div>
+
+					@if (User.HasClaim(c => c.Value == "admin" || c.Value == "moderator") || comment.PostedBy == User.Identity.Name)
+					{
+						<div class="actions">
+							<a class="reply">Delete</a>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	}
+	else
+	{
+		<div class="ui message">
+			<div class="header">No comments!</div>
+			<p>No one has commented yet, be the first!</p>
+		</div>
+	}
+
+	<form class="ui reply form">
+		<div class="field">
+			<textarea id="commentinput"></textarea>
+		</div>
+		<div id="submitCommentBtn" class="ui blue labeled icon button">
+			<i class="icon edit"></i> Add Comment
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		var mdConverter = new showdown.Converter();
+		$(".markdown").each(function() {
+			$(this).html(mdConverter.makeHtml($(this).text()));
+		});
+	});
+
+	$("#submitCommentBtn").on("click", function () {
+		var dSub = {
+			Glyph: "@Model.Glyph",
+			Text: $("#commentinput").val()
+		};
+
+		$.ajax({
+			type: "POST",
+			url: "/dungeon/submitcomment",
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			data: JSON.stringify(dSub),
+			success: function () {
+				window.location.reload(true);
+			}
+		});
+	});
+</script>

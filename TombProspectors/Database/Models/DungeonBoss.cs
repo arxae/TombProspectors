@@ -13,5 +13,8 @@
 
 		[Column]
 		public string WikiLink { get; set; }
+
+		[Column, NotNull]
+		public System.DateTime Updated { get; set; }
 	}
 }

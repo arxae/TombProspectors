@@ -4,75 +4,193 @@
 	ViewBag.Title = "Submit new glyph";
 }
 
-<form action="/api/SubmitNewGlyph" method="post">
-	<fieldset class="uk-fieldset">
-		<legend class="uk-legend">Submit new glyph</legend>
+<form id="newGlyphForm" class="ui form" action="/dungeon/SubmitNewGlyph" method="post">
+	<div class="ui error message"></div>
+	<div class="field">
+		<label>Dungeon Glyph</label>
+		<input type="text" name="DungeonGlyph" placeholder="Glyph" />
+	</div>
 
-		<div class="uk-margin">
-			<label for="dungeonGlyph">Dungeon Glyph</label>
-			<input name="DungeonGlyph" id="dungeonGlyph" class="uk-input" type="text" placeholder="Dungeon Glyph" />
-		</div>
+	<div class="field">
+		<label>Short Description</label>
+		<input type="text" name="ShortDescription" placeholder="Short Description" />
+	</div>
 
-		<div class="uk-margin">
-			<label for="rootChaliceSelect">Root Chalice</label>
-			<select name="RootChalice" id="rootChaliceSelect" class="uk-select combobox">
-				@foreach (var chalice in Model.RootChalices)
+	<div class="two fields">
+		<div class="field">
+			@*<div class="ui selection dropdown">
+					<input type="hidden" name="RootChalice">
+					<i class="dropdown icon"></i>
+					<div class="default text">Root Chalice</div>
+					<div class="menu">
+						@foreach (var chalice in Model.RootChalices)
+						{
+							<div class="item" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
+						}
+					</div>
+				</div>*@
+			<select name="RootChalice" class="ui fluid selection search dropdown">
+				<option value="">Select Chalice</option>
+				@foreach (var c in Model.RootChalices)
 				{
-					<option value="@chalice.ChaliceId">@chalice.ChaliceName</option>
+					<option value="@c.ChaliceId">@c.ChaliceName</option>
 				}
 			</select>
+
 		</div>
 
-
-		<label for="addRitesCheckboxes">Additional Rites</label>
-		<div id="addRitesCheckboxes" class="uk-grid-small uk-child-width-auto uk-grid">
-			<label>@Html.CheckBox("Fetid", false, new { @class = "uk-checkbox" }) Fetid</label>
-			<label>@Html.CheckBox("Rotted", false, new { @class = "uk-checkbox" }) Rotted</label>
-			<label>@Html.CheckBox("Cursed", false, new { @class = "uk-checkbox" }) Cursed</label>
+		<div class="field">
+			<div class="ui selection dropdown">
+				<input type="hidden" name="Layers">
+				<i class="dropdown icon"></i>
+				<div class="default text">Layers</div>
+				<div class="menu">
+					<div class="item" data-value="1">1</div>
+					<div class="item" data-value="2">2</div>
+					<div class="item" data-value="3">3</div>
+					<div class="item" data-value="4">4</div>
+					<div class="item" data-value="5">5</div>
+				</div>
+			</div>
 		</div>
+	</div>
 
-		<div class="uk-margin">
-			<label for="dungeonBoss">Dungeon Boss(es)</label>
-			<select name="Bosses" id="dungeonBoss" class="combobox" multiple style="width:100%">
-				@foreach (var boss in Model.Bosses)
-				{
-					<option value="@boss.Id">@boss.BossName</option>
-				}
-			</select>
+	<div class="inline fields">
+		<label>Additional Rites</label>
+		<div class="field">
+			<div class="ui checkbox">
+				<input type="checkbox" id="fetidCh" />
+				@Html.Hidden("Fetid")
+				<label>Fetid</label>
+			</div>
 		</div>
-
-		<div class="uk-margin">
-			<label for="dungeonLoot">Notable Loot</label>
-			<select name="Loot" id="dungeonLoot" class="cmb2" multiple style="width: 100%">
-				@foreach (var loot in Model.Loot)
-				{
-					<option value="@loot.Id">@loot.ItemName</option>
-				}
-			</select>
+		<div class="field">
+			<div class="ui checkbox">
+				<input type="checkbox" id="rottedCh">
+				@Html.Hidden("Rotted")
+				<label>Rotted</label>
+			</div>
 		</div>
-
-		<div class="uk-margin">
-			<label for="notesArea">Extra notes</label>
-			<textarea name="Notes" id="notesArea" class="uk-textarea"></textarea>
+		<div class="field">
+			<div class="ui checkbox">
+				<input type="checkbox" id="cursedCh">
+				@Html.Hidden("Cursed")
+				<label>Cursed</label>
+			</div>
 		</div>
-	</fieldset>
+		<div class="field">
+			<div class="ui checkbox">
+				<input type="checkbox" id="sinisterCh">
+				@Html.Hidden("Sinister")
+				<label>Sinister</label>
+			</div>
+		</div>
+	</div>
 
-	<input type="submit" class="uk-button uk-button-primary" />
-	<input type="reset" id="resetBtn" class="uk-button uk-button-danger" />
+	<div class="inline fields">
+		<label>Is Save Edited?</label>
+		<div class="field">
+			<div class="ui checkbox">
+				<input type="checkbox" id="saveEditedCh" />
+				@Html.Hidden("SaveEdited")
+				<label></label>
+			</div>
+		</div>
+	</div>
+
+	<div class="field">
+		<select name="Bosses" class="ui fluid search dropdown" multiple>
+			<option value="">Bosses</option>
+			@foreach (var boss in Model.Bosses)
+			{
+				<option value="@boss.Id">@boss.BossName</option>
+			}
+		</select>
+	</div>
+
+	<div class="field">
+		<label>Noteable Loot (Specifics can be mentioned in the notes, allows additions). In case of no notable loot, you can select &quot;Curio&quot;</label>
+		<select name="Loot" class="ui fluid search dropdown allowAdditions" multiple>
+			<option value="">Notable loot (Specifics can be mentioned in the notes, allows additions)</option>
+			@foreach (var loot in Model.Loot)
+			{
+				<option value="@loot.Id">@loot.ItemName</option>
+			}
+		</select>
+	</div>
+
+	<div class="field">
+		<label>Notes</label>
+		<textarea rows="5" name="Notes" placeholder="Notes"></textarea>
+	</div>
+
+	<div class="fluid ui buttons">
+		<button type="submit" class="ui button primary">Submit</button>
+		<div class="or"></div>
+		<button type="reset" class="ui button negative">Reset</button>
+	</div>
 </form>
 
 @section Script {
 	<script type="text/javascript">
 		$(document).ready(function () {
-			$(".cmb2").select2({
-				tags: true
+			$(".ui.dropdown").dropdown();
+			$(".allowAdditions").dropdown({
+				allowAdditions: true
+			});
+
+			// Prevent form submission on enter (happens when adding custom loot)
+			$(document).on("keydown", function (e) {
+				if (e.which === 13 && !$(e.target).is("textarea")) {
+					e.preventDefault();
+					return;
+				}
 			});
 		});
 
-		$("#resetBtn").on("click",
-			function () {
-				$(".combobox").val(null).trigger("change");
-				$(".cmb2").val(null).trigger("change");
+		// Sync checkboxes with hidden input field
+		$('#fetidCh').change(function () { $("#Fetid").val($("#fetidCh").prop("checked")); });
+		$('#rottedCh').change(function () { $("#Rotted").val($("#rottedCh").prop("checked")); });
+		$('#cursedCh').change(function () { $("#Cursed").val($("#cursedCh").prop("checked")); });
+		$('#sinisterCh').change(function () { $("#Sinister").val($("#sinisterCh").prop("checked")); });
+		$('#saveEditedCh').change(function () { $("#SaveEdited").val($("#saveEditedCh").prop("checked")); });
+
+		// Validation
+		$("#newGlyphForm")
+			.form({
+				on: "blur",
+				fields: {
+					DungeonGlyph: {
+						identifier: "DungeonGlyph",
+						rules: [{ type: "exactLength[8]" }]
+					},
+					ShortDescription: {
+						identifier: "ShortDescription",
+						rules: [{ type: "minLength[5]" }]
+					},
+					Bosses: {
+						identifier: "Bosses",
+						rules: [{ type: "minCount[1]", primpt: "You need to select at least 1 boss" }]
+					},
+					Loot: {
+						identifier: "Loot",
+						rules: [{ type: "minCount[1]", prompt: "You need to select at least 1 piece of loot" }]
+					},
+					RootChalice: {
+						identifier: "RootChalice",
+						rules: [{ type: "empty", prompt: "You need to select a root chalice" }]
+					},
+					Layers: {
+						identifier: "Layers",
+						rules: [{ type: "empty", prompt: "Please select the amount of layers" }]
+					}
+				}
 			});
+
+		$("#newGlyphForm").submit(function (e) {
+			if ($("#newGlyphForm").form("is valid") == false) {
+				e.preventDefault();
+			}
+		});
 	</script>
 }

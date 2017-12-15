@@ -7,12 +7,23 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Content Include="SearchResultEntry.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="HtmlSanitizer" Version="4.0.181" />
 		<PackageReference Include="linq2db.Core" Version="1.10.1" />
 		<PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="wwwroot\lib\semanticui\themes\default\assets\fonts\icons.svg" />
+	  <None Include="wwwroot\lib\semanticui\themes\default\assets\fonts\icons.woff2" />
 	</ItemGroup>
 
 </Project>

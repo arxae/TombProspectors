@@ -1,0 +1,53 @@
+﻿@model TombProspectors.GeneralSearchModel
+@{
+	Layout = "_Layout";
+	ViewBag.Title = $"Search results for {ViewBag.SearchQuery}";
+}
+
+<div class="ui segment">
+	<div class="ui right close rail">
+		<div class="ui segment">
+			Based on the following items:
+			<ul>
+				@foreach (var item in Model.LootResults.OrderBy(l=>l.ItemName))
+				{
+					<li>
+						@if (item.WikiLink != null)
+						{
+							<a href="@item.WikiLink" target="_blank">@item.ItemName</a>
+						}
+						else
+						{
+							@item.ItemName
+						}
+					</li>
+				}
+			</ul>
+		</div>
+	</div>
+	<h3 style="margin-top:0">Search results for &quot;<i>@ViewBag.SearchQuery</i>&quot;</h3>
+</div>
+
+<table class="ui table">
+	<thead>
+		<tr>
+			<th>Glyph</th>
+			<th>Root Chalice</th>
+			<th>Short Description</th>
+			<th>Submitter</th>
+			<th>Updated</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var glyph in Model.GlyphResults)
+		{
+			<tr>
+				<td><a href="/dungeon/viewglyph/@glyph.Glyph">@glyph.Glyph</a></td>
+				<td>@glyph.RootChalice</td>
+				<td>@glyph.ShortDescription</td>
+				<td>@glyph.Submitter</td>
+				<td>@glyph.Updated</td>
+			</tr>
+		}
+	</tbody>
+</table>

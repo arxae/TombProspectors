@@ -1,0 +1,80 @@
+﻿@model List<TombProspectors.SearchResultEntry>
+
+<style>
+	.perfectRating {
+		color: darkorange;
+	}
+
+	.highRating {
+		color: green;
+	}
+
+	.mediumRating {
+		color: darkgoldenrod;
+	}
+
+	.lowRating {
+		color: darkred;
+	}
+</style>
+
+<table class="ui table">
+	<thead>
+		<tr>
+			<th>Glyph</th>
+			<th>Root Chalice</th>
+			<th>Short Description</th>
+			<th>Submitter</th>
+			<th>Rating</th>
+			<th>Updated</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model.OrderByDescending(d => d.Upvotes - d.Downvotes))
+		{
+			<tr>
+				<td><a href="/dungeon/viewglyph/@item.Glyph">@item.Glyph</a></td>
+				<td>@item.RootChalice</td>
+				<td>@item.ShortDescription</td>
+				<td>@item.Submitter</td>
+				<td>
+					@{
+						double ratio = item.Upvotes / (double)(item.Upvotes + item.Downvotes);
+						string ratingString = string.Format("{0:0.0%}", ratio);
+						string ratingClass;
+
+						if (ratio == 1.0)
+						{
+							ratingClass = "perfectRating";
+						}
+						else if (ratio < 1.0 && ratio > 0.75)
+						{
+							ratingClass = "highRating";
+						}
+						else if (ratio < 0.74 && ratio > 0.49)
+						{
+							ratingClass = "mediumRating";
+						}
+						else // < 0.50
+						{
+							ratingClass = "lowRating";
+						}
+
+						bool newGlyph = item.Upvotes == 1 && item.Downvotes == 0;
+					}
+
+					<div class="item">
+						<div class="content">
+							<span class="@ratingClass">@ratingString</span>
+							@if (ratio == 1.0 && newGlyph == false)
+							{
+								<i class="perfectRating star icon"></i>
+							}
+						</div>
+					</div>
+				</td>
+				<td>@item.Updated</td>
+			</tr>
+		}
+	</tbody>
+</table>

@@ -1,0 +1,37 @@
+﻿@model List<TombProspectors.Database.Models.Loot>
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "Loot";
+}
+
+<div class="ui message">
+	<div class="header">Find glyphs by Loot</div>
+	<p>
+		<select id="lootSelector" class="ui fluid selection search dropdown">
+			<option value="">Select Loot</option>
+			@foreach (var item in Model)
+			{
+				<option value="@item.Id">@item.ItemName</option>
+			}
+		</select>
+	</p>
+</div>
+
+<div id="results">
+	<div id="resultsAnchor"></div>
+</div>
+
+@section Script {
+	<script type="text/javascript">
+		var partialLink = '@Url.Action("LoadGlyphsByLoot", "lists", new { lootId= "changeme"})';
+		$(document).ready(function () {
+			$("#lootSelector").dropdown("setting", "onChange", function (lootId) {
+				var link = partialLink.replace("changeme", lootId);
+
+				$.get(link, function (data) {
+					$("#resultsAnchor").html(data);
+				});
+			});
+		});
+	</script>
+}

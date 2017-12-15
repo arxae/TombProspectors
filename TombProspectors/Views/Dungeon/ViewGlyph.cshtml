@@ -1,35 +1,107 @@
 ﻿@model TombProspectors.Controllers.DungeonController.ViewGlyphModel
-
 @{
 	Layout = "_Layout";
-	ViewBag.Title = "View Glyph: " + Model.Dungeon.Glyph;
+	ViewBag.Title = "View Glyphing: " + Model.Dungeon.Glyph;
 }
 
 @section Head {
 	<style>
-		.wikiLink {
-			color: lightgrey
+		.submitData {
+			font-style: italic;
+			font-weight: bold;
+		}
+
+		.upvoteData {
+			color: green;
+		}
+
+		.downvoteData {
+			color: red;
 		}
 	</style>
 }
 
-<article class="uk-article">
-	<h1 class="uk-article-title">Viewing Glyph: @Model.Dungeon.Glyph</h1>
+<h1 class="ui huge sub header">
+	Viewing Glyph <i>@Model.Dungeon.Glyph</i>
+</h1>
+<span>@Model.Dungeon.ShortDescription</span>
+<br />
 
-	<ul class="uk-list uk-list-divider">
-		<li>Root Chalice: @Model.Dungeon.RootChalice</li>
+<div class="ui mini statistic">
+	<div class="value">
+		<span class="upvoteData">+@Model.Dungeon.Upvotes</span> / <span class="downvoteData">-@Model.Dungeon.Downvotes</span>
+	</div>
+	<div class="label">
+		Rating
+		@*Allow rating when user is logged in and not the submitter*@
+		@if (User.Identity.IsAuthenticated && Model.HasVoted == false && User.Identity.Name != Model.Dungeon.Submitter)
+		{
+			<a href="#" id="upvoteBtn"><i class="thumbs up icon"></i></a>
+			<a href="#" id="downvoteBtn"><i class="thumbs down icon"></i></a>
+		}
+	</div>
+</div>
+
+<div class="ui top attached tabular menu">
+	<a class="item active" data-tab="tab_glyph">Glyph</a>
+	<a class="item" data-tab="tab_images">Images</a>
+	<a class="item" data-tab="tab_comments">Comments</a>
+</div>
+<div class="ui bottom attached tab segment active" data-tab="tab_glyph">
+	<ul class="ui list">
+		<li>
+			<b>Root Chalice:</b> @Model.RootChaliceDisplayName
+		</li>
+		<li>
+			<a href="#">
+				@if (Model.Dungeon.Fetid)
+				{<div class="ui green label">Fetid</div>}
+				else
+				{<div class="ui red label">Fetid</div>}
+			</a>
+
+			<a href="#">
+				@if (Model.Dungeon.Rotted)
+				{<div class="ui green label">Rotted</div>}
+				else
+				{<div class="ui red label">Rotted</div>}
+			</a>
+
+			<a href="#">
+				@if (Model.Dungeon.Cursed)
+				{<div class="ui green label">Cursed</div>}
+				else
+				{<div class="ui red label">Cursed</div>}
+			</a>
+
+			<a href="#">
+				@if (Model.Dungeon.Sinister)
+				{<div class="ui green label">Sinister</div>}
+				else
+				{<div class="ui red label">Sinister</div>}
+			</a>
+
+			<a href="#">
+				@if (Model.Dungeon.SaveEdited)
+				{<div class="ui green label">Save Edited</div>}
+				else
+				{<div class="ui red label">Save Edited</div>}
+			</a>
+		</li>
 
 		<li>
-			Bosses:
+			<b>Bosses:</b>
 			<ul>
 				@foreach (var boss in Model.Bosses)
 				{
 					<li>
-						@boss.BossName
-
 						@if (boss.WikiLink != null)
 						{
-							<a href="@boss.WikiLink" class="uk-button uk-button-text wikiLink" target="_blank">(W)</a>
+							<a href="@boss.WikiLink" target="_blank">@boss.BossName</a>
+						}
+						else
+						{
+							<span>@boss.BossName</span>
 						}
 					</li>
 				}
@@ -37,16 +109,18 @@
 		</li>
 
 		<li>
-			Loot:
+			<b>Loot:</b>
 			<ul>
 				@foreach (var loot in Model.Loot)
 				{
 					<li>
-						@loot.ItemName
-
 						@if (loot.WikiLink != null)
 						{
-							<a href="@loot.WikiLink" class="uk-button uk-button-text wikiLink" target="_blank">(W)</a>
+							<a href="@loot.WikiLink" target="_blank">@loot.ItemName</a>
+						}
+						else
+						{
+							<span>@loot.ItemName</span>
 						}
 
 					</li>
@@ -55,15 +129,83 @@
 		</li>
 	</ul>
 
-	<label>@Html.CheckBoxFor(m => m.Dungeon.Fetid, new { @class = "uk-checkbox", onclick = "return false;" }) Fetid</label>
-	<label>@Html.CheckBoxFor(m => m.Dungeon.Rotted, new { @class = "uk-checkbox", onclick = "return false;" }) Rotted</label>
-	<label>@Html.CheckBoxFor(m => m.Dungeon.Cursed, new { @class = "uk-checkbox", onclick = "return false;" }) Cursed</label>
+	<b>Notes:</b>
+	<div class="ui message">
+		<span id="notesAnchor">@Model.Dungeon.Notes</span>
+	</div>
 
-	<p>
-		Notes:
-		@Html.TextAreaFor(m => m.Dungeon.Notes, new { @class = "uk-textarea", @readonly = "readonly" })
+	@if (User.Identity.Name == Model.Dungeon.Submitter)
+	{
+		<a href="/dungeon/edit/@Model.Dungeon.Glyph">Edit glyph</a>
+	}
+
+	<p style="color:darkgray;">
+		Submitted on <span class="submitData">@Model.Dungeon.Updated</span> by
+
+		@if (Model.Dungeon.Submitter == User.Identity.Name)
+		{
+			<span class="submitData">You</span>
+		}
+		else
+		{
+			<span class="submitData">@Model.Dungeon.Submitter</span>
+		}
+
 	</p>
+</div>
+<div class="ui bottom attached tab segment" data-tab="tab_images">
+	<b>IMAGES HERE</b>
+</div>
+<div class="ui bottom attached tab segment" data-tab="tab_comments">
+	<div id="commentsAnchor"></div>
+	<div id="commentsLoaderIndicator" class="ui active centered inline text loader">Getting comments</div>
+</div>
 
-	<hr />
-	<p class="uk-article-meta">Submitted on @Model.Dungeon.Updated</p>
-</article>
+<input id="dungData" type="hidden" data-glyph="@Model.Dungeon.Glyph" />
+
+@section Script {
+	<script type="text/javascript" src="~/js/showdown.min.js"></script>
+	<script type="text/javascript">
+		$("#upvoteBtn").on("click", function () { sendVote("up") });
+		$("#downvoteBtn").on("click", function () { sendVote("down") });
+
+		$(document).ready(function() {
+			var mdConverter = new showdown.Converter();
+			var text = $("#notesAnchor").text();
+			$("#notesAnchor").html(mdConverter.makeHtml(text));
+		});
+
+		function sendVote(direction) {
+			var votePackage = {
+				Vote: direction,
+				Glyph: $("#dungData").data("glyph")
+			};
+
+			$.ajax({
+				type: "POST",
+				url: "/dungeon/submitvote",
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				data: JSON.stringify(votePackage),
+				success: function () {
+					window.location.reload(true);
+				}
+			});
+		}
+
+		var discussionLoaded = false;
+		$(".menu .item").tab({
+			onVisible: function (tabName) {
+				if (tabName !== "tab_comments" && discussionLoaded === true) return;
+
+				$.get("@Url.Action("LoadComments", "dungeon", new { glyph = Model.Dungeon.Glyph })", function (data) {
+					$("#commentsAnchor").html(data);
+					$("#commentsLoaderIndicator").remove();
+					discussionLoaded = true;
+				});
+			}
+		});
+	</script>
+}

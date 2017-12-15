@@ -1,0 +1,36 @@
+﻿@model List<TombProspectors.Database.Models.DungeonBoss>
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "Loot by Boss";
+}
+
+<div class="ui message">
+	<div class="header">Find glyphs by Boss</div>
+	<p>
+		<select id="lootSelector" class="ui fluid selection search dropdown">
+			<option value="">Select Boss</option>
+			@foreach (var boss in Model)
+			{
+				<option value="@boss.Id">@boss.BossName</option>
+			}
+		</select>
+	</p>
+</div>
+
+<div id="results">
+	<div id="resultsAnchor"></div>
+</div>
+
+@section Script {
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$("#lootSelector").dropdown("setting", "onChange", function (bossId) {
+				var link = "/lists/LoadGlyphsByboss?bossId=" + bossId;
+
+				$.get(link, function (data) {
+					$("#resultsAnchor").html(data);
+				});
+			});
+		});
+	</script>
+}

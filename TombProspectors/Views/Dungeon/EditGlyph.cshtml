@@ -1,0 +1,183 @@
+﻿@model TombProspectors.Controllers.DungeonController.EditGlyphModel
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "Editing " + Model.Dungeon.Glyph;
+}
+
+<h1>Edditing @Model.Dungeon.Glyph</h1>
+
+<form id="newGlyphForm" class="ui form" action="/dungeon/SubmitGlyphEdit" method="post">
+	<input type="hidden" name="DungeonGlyph" value="@Model.Dungeon.Glyph" />
+
+	<div class="field">
+		<label>Short Description</label>
+		<input type="text" name="ShortDescription" placeholder="Short Description" value="@Model.Dungeon.ShortDescription" />
+	</div>
+
+	<div class="two fields">
+		<div class="field">
+			<div class="ui selection dropdown" id="rootChaliceDropdown">
+				<input type="hidden" name="RootChalice">
+				<i class="dropdown icon"></i>
+				<div class="default text">Root Chalice</div>
+				<div class="menu">
+					@foreach (var chalice in Model.Lists.RootChalices)
+					{
+						if (chalice.ChaliceId == Model.Dungeon.RootChalice)
+						{
+							<div class="item selected" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
+						}
+						else
+						{
+							<div class="item" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
+						}
+					}
+				</div>
+			</div>
+		</div>
+
+		<div class="field">
+			<div class="ui selection dropdown" id="layersDropdown">
+				<input type="hidden" name="Layers">
+				<i class="dropdown icon"></i>
+				<div class="default text">Layers</div>
+				<div class="menu">
+					<div class="item" data-value="1">1</div>
+					<div class="item" data-value="2">2</div>
+					<div class="item" data-value="3">3</div>
+					<div class="item" data-value="4">4</div>
+					<div class="item" data-value="5">5</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="inline fields">
+		<label>Additional Rites</label>
+		<div class="field">
+			<div id="fetidChUi" class="ui checkbox">
+				<input type="checkbox" id="fetidCh" />
+				@Html.Hidden("Fetid")
+				<label>Fetid</label>
+			</div>
+		</div>
+		<div class="field">
+			<div id="rottedChUi" class="ui checkbox">
+				<input type="checkbox" id="rottedCh">
+				@Html.Hidden("Rotted")
+				<label>Rotted</label>
+			</div>
+		</div>
+		<div class="field">
+			<div id="cursedChUi" class="ui checkbox">
+				<input type="checkbox" id="cursedCh">
+				@Html.Hidden("Cursed")
+				<label>Cursed</label>
+			</div>
+		</div>
+		<div class="field">
+			<div id="sinisterChUi" class="ui checkbox">
+				<input type="checkbox" id="sinisterCh">
+				@Html.Hidden("Sinister")
+				<label>Sinister</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="inline fields">
+		<label>Save Edited</label>
+		<div class="field">
+			<div id="saveEditedChUi" class="ui checkbox">
+				<input type="checkbox" id="saveEditedCh" />
+				@Html.Hidden("SaveEdited")
+				<label></label>
+			</div>
+		</div>
+	</div>
+
+	<div class="field">
+		<select id="bossDropdown" name="Bosses" class="ui fluid search dropdown" multiple>
+			<option value="">Bosses</option>
+			@foreach (var boss in Model.Lists.Bosses)
+			{
+				<option value="@boss.Id">@boss.BossName</option>
+			}
+		</select>
+	</div>
+
+	<div class="field">
+		<label>Noteable Loot (Specifics can be mentioned in the notes, allows additions)</label>
+		<select id="lootDropdown" name="Loot" class="ui fluid search dropdown allowAdditions" multiple>
+			<option value="">Notable loot (Specifics can be mentioned in the notes, allows additions)</option>
+			@foreach (var loot in Model.Loot)
+			{
+				<option value="@loot.Id">@loot.ItemName</option>
+			}
+		</select>
+	</div>
+
+	<div class="field">
+		<label>Notes</label>
+		<textarea rows="5" name="Notes" placeholder="Notes">@Model.Dungeon.Notes</textarea>
+	</div>
+
+	<button class="ui button positive" type="submit">Save changes</button>
+	<a class="ui button negative" href="/dungeon/viewglyph/@Model.Dungeon.Glyph">Cancel</a>
+</form>
+
+<input id="editData" type="hidden"
+	   data-rootchalice="@Model.Dungeon.RootChalice"
+	   data-layers="@Model.Dungeon.Layers"
+	   data-fetid="@Model.Dungeon.Fetid"
+	   data-rotted="@Model.Dungeon.Rotted"
+	   data-cursed="@Model.Dungeon.Cursed"
+	   data-saveedited="@Model.Dungeon.SaveEdited"
+	   data-sinister="@Model.Dungeon.Sinister"
+	   data-bosses="@Model.Dungeon.Bosses"
+	   data-loot="@Model.Dungeon.Loot" />
+
+@section Script {
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$(".ui.dropdown").dropdown();
+
+			$(".allowAdditions").dropdown({
+				allowAdditions: true
+			});
+
+			$("#rootChaliceDropdown").dropdown("set selected", $("#editData").data("rootchalice"));
+			$("#layersDropdown").dropdown("set selected", getInitData("layers"));
+
+			if (getInitData("fetid") === "True") { $("#fetidChUi").checkbox("set checked"); }
+			if (getInitData("rotted") === "True") { $("#rottedChUi").checkbox("set checked"); }
+			if (getInitData("cursed") === "True") { $("#cursedChUi").checkbox("set checked"); }
+			if (getInitData("sinister") === "True") { $("#sinisterChUi").checkbox("set checked"); }
+			if (getInitData("saveedited") === "True") { $("#saveEditedChUi").checkbox("set checked"); }
+
+			var bossIds = "" + getInitData("bosses");
+			var lootIds = "" + getInitData("loot");
+
+			$("#bossDropdown").dropdown("set selected", bossIds.split2(";"));
+			$("#lootDropdown").dropdown("set selected", lootIds.split2(";"));
+
+			// Prevent form submission on enter (happens when adding custom loot)
+			$(document).on("keydown", function (e) {
+				if (e.which === 13 && !$(e.target).is("textarea")) {
+					e.preventDefault();
+					return;
+				}
+			});
+		});		
+
+		function getInitData(val) {
+			return $("#editData").data(val);
+		}
+
+		// Sync checkboxes with hidden input field
+		$('#fetidCh').change(function () { $("#Fetid").val($("#fetidCh").prop("checked")); });
+		$('#rottedCh').change(function () { $("#Rotted").val($("#rottedCh").prop("checked")); });
+		$('#cursedCh').change(function () { $("#Cursed").val($("#cursedCh").prop("checked")); });
+		$('#sinisterCh').change(function () { $("#Sinister").val($("#sinisterCh").prop("checked")); });
+		$('#saveEditedCh').change(function () { $("#SaveEdited").val($("#saveEditedCh").prop("checked")); });
+	</script>
+}

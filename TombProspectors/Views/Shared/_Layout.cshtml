@@ -1,58 +1,126 @@
 ﻿<!DOCTYPE html>
-<html>
+<html class="no-js" lang="en">
 
 <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="x-ua-compatible" content="ie=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Tomb Prospectors - @ViewBag.Title</title>
-	<link href="~/lib/uikit/css/uikit.min.css" rel="stylesheet" />
-	<link href="~/lib/select2/css/select2.min.css" rel="stylesheet" />
-	
+	<link rel="stylesheet" href="~/lib/select2/css/select2.min.css" />
+	<link rel="stylesheet" href="~/lib/semanticui/components/icon.min.css" />
+	<link rel="stylesheet" href="~/lib/semanticui/semantic.min.css" />
+	<link rel="stylesheet" href="~/lib/alertify/css/alertify.min.css" />
+	<link rel="stylesheet" href="~/lib/alertify/css/themes/default.min.css" />
+
+	<style>
+		.main.container {
+			margin-top: 5em;
+		}
+	</style>
+
 	@RenderSection("Head", false)
 </head>
 
 <body>
-	<div class="uk-container">
-		@*<h1>
-				<a href="/" class="uk-link-reset">Tomb Prospectors</a>
-				|
-				<a href="/" class="uk-button uk-button-text">Home</a>
-				<a href="#" class="uk-button uk-button-text">New glyph</a>
-				|
+	<div class="ui fixed inverted menu">
+		<div class="ui container">
+			<a href="/" class="header item">
+				<img src="http://placekitten.com/g/128/128">&nbsp;
+				Tomb Prospectors
+			</a>
 
-			</h1>*@
-
-		<nav class="uk-navbar-container uk-margin" uk-navbar>
-			<div class="uk-navbar-left">
-
-				<a class="uk-navbar-item uk-logo" href="/">Tomb Prospectors</a>
-
-				<div class="uk-navbar-item">
-					<div><a href="/dungeon/addglyph" class="uk-button uk-button-text">New Glyph</a></div>
+			<div class="ui simple dropdown item">
+				Lists <i class="dropdown icon"></i>
+				<div class="menu">
+					<a class="item" href="/lists/glyphsbyloot">Glyphs by Loot</a>
+					<a class="item" href="/lists/glyphsbyboss">Glyphs by Boss</a>
+					<a class="item" href="/lists/glyphsbyrootchalices">Glyphs by Root Chalice</a>
 				</div>
 			</div>
 
-			<div class="uk-navbar-right">
-				<div class="uk-navbar-item">
-					<button class="uk-button uk-button-default" style="margin-right:1%">Search</button>
-					<form class="uk-search uk-search-default">
-						<span class="uk-search-icon-flip" uk-search-icon></span>
-						<input class="uk-search-input" type="search" placeholder="Search...">
-					</form>
+			@if (User.Identity.IsAuthenticated)
+			{
+				<a href="/dungeon/addglyph" class="item">New Glyph</a>
+
+				<div class="ui simple dropdown item">
+					<i class="user outline icon"></i><i class="dropdown icon"></i>
+					<div class="menu">
+						<div class="header">@User.Identity.Name</div>
+						<a class="item" href="/account/profile">Profile</a>
+						<div class="divider"></div>
+						<a class="item" href="/account/logout">Logout</a>
+					</div>
+				</div>
+			}
+			else
+			{
+				<a href="/account/register" class="item">Register</a>
+				<a href="/account/login" class="item">Login</a>
+			}
+
+			<div class="right item">
+				<div class="ui icon input">
+					<input id="searchInput" type="text" placeholder="Search for loot or glyph...">
+					<i id="searchButton" class="search link icon"></i>
 				</div>
 			</div>
-		</nav>
+		</div>
+	</div>
 
+	<div class="ui main text container">
 		@RenderBody()
 	</div>
 
 	<script type="text/javascript" src="~/js/jquery-3.2.1.min.js"></script>
-	<script type="text/javascript" src="~/lib/uikit/js/uikit.min.js"></script>
-	<script type="text/javascript" src="~/lib/uikit/js/uikit-icons.min.js"></script>
-	<script type="text/javascript" src="~/lib/select2/js/select2.min.js"></script>
-	<script type="text/javascript" src="~/dist/app.js"></script>
+	<script type="text/javascript" src="~/lib/semanticui/semantic.min.js"></script>
+	<script type="text/javascript" src="~/lib/alertify/alertify.min.js"></script>
 	<script type="text/javascript">
+		// Setup alertify
+		alert = alertify.alert;
+		alertify.alert().set({ 'closableByDimmer': false });
+
+		$("#searchBtn").on("click",
+			function () {
+				var query = $("#searchQuery").val();
+				var type = $("#searchtype").dropdown("get value");
+				window.location.href = "/dungeon/search?t=" + type + "&q=" + query;
+			});
+
 		$(document).ready(function () {
-			$(".combobox").select2();
+			// Control setup
+			$(".dropdown").dropdown();
+			$("#searchtype").dropdown("set selected", "loot");
+
+			// Control Events
+			$("#searchButton").on("click", submitSearch);
+			$("#searchInput").on("keydown", function (e) {
+				if ($(e.target).is("input") && e.which === 13) {
+					submitSearch();
+				}
+			});
 		});
+
+		function submitSearch() {
+			var query = $("#searchInput").val();
+
+			if (query.length < 3) {
+				alert("Search", "You need to enter at least 3 characters");
+				return;
+			}
+
+			var type = "loot";
+
+			window.location.href = "/dungeon/search?q=" + query + "&t=" + type;
+		}
+
+		// Split that removes empty entries
+		String.prototype.split2 = function (delimiter) {
+			if (typeof (delimiter) === undefined) {
+				return [this]
+			}
+
+			return this.split(delimiter).filter(function (e) { return e.length != 0 });
+		}
 	</script>
 
 	@RenderSection("Script", false)

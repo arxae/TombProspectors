@@ -1,0 +1,93 @@
+﻿@model List<TombProspectors.Database.Models.RootChalice>
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "Loot";
+}
+
+<div class="ui message">
+	<div class="header">Find glyphs by Root Chalice</div>
+	<div>
+		<select id="chaliceSelector" class="ui search selection fluid dropdown">
+			<option value="">Select root chalice</option>
+			@foreach (var chalice in Model)
+			{
+				<option value="@chalice.ChaliceId">@chalice.ChaliceName</option>
+			}
+		</select>
+
+		<div class="ui form">
+			<div class="inline fields" style="margin-bottom:0; margin-top:1em">
+				<label>Specify Rites</label>
+				<div class="field">
+					<div class="ui checkbox">
+						<input type="checkbox" id="fetidCh" />
+						<label>Fetid</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui checkbox">
+						<input type="checkbox" id="rottedCh">
+						<label>Rotted</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui checkbox">
+						<input type="checkbox" id="cursedCh">
+						<label>Cursed</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui checkbox">
+						<input type="checkbox" id="sinisterCh">
+						<label>Sinister</label>
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui checkbox">
+						<input type="checkbox" id="saveEditedCh" />
+						<label>Save Edited</label>
+					</div>
+				</div>
+				<div class="field">
+					<button id="chaliceSearchBtn" class="ui button primary">Search</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="results">
+	<div id="resultsAnchor"></div>
+</div>
+
+@section Script {
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$("#chaliceSearchBtn").on("click", function () {
+				var dropdownVal = $("#chaliceSelector").dropdown("get value");
+				if (dropdownVal.length == 0) {
+					alert("Error", "Please select a chalice first");
+					return;
+				}
+
+				var rites = [];
+				if ($("#fetidCh").prop("checked")) { rites.push("fetid"); }
+				if ($("#rottedCh").prop("checked")) { rites.push("rotted"); }
+				if ($("#cursedCh").prop("checked")) { rites.push("cursed"); }
+				if ($("#sinisterCh").prop("checked")) { rites.push("sinister"); }
+				if ($("#saveEditedCh").prop("checked")) { rites.push("saveedit"); }
+
+				if (rites.length == 0) {
+					rites.push("all");
+				}
+
+				var link = "/lists/LoadGlyphsByRootChalice?chaliceId=" + dropdownVal + "&rites=" + rites.join(",");
+
+				$.get(link, function (data) {
+					console.log(link);
+					$("#resultsAnchor").html(data);
+				});
+			});
+		});
+	</script>
+}

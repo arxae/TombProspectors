@@ -1,0 +1,54 @@
+﻿@{
+	ViewBag.Title = "Login";
+	Layout = "_Layout";
+}
+
+<form id="loginForm" class="ui form" action="/account/login" method="post">
+
+	<div class="field">
+		<label>Username</label>
+		<input type="text" name="Username" placeholder="Username">
+	</div>
+
+	<div class="field">
+		<label>Password</label>
+		<input type="password" name="Password" placeholder="Password">
+	</div>
+
+	@if (ViewBag.IncorrectLogin != null || ViewBag.IncorrectLogin == false)
+	{
+		<div class="ui negative message">
+			<p>Incorrect username/password combination</p>
+		</div>
+	}
+
+	<button id="submitBtn" class="fluid ui button primary">Login</button>
+</form>
+
+@section Script {
+	<script type="text/javascript">
+
+		$("#loginForm")
+			.form({
+				on: "blur",
+				fields: {
+					Username: {
+						identifier: "Username",
+						rules:
+						[
+							{ type: "minLength[3]" },
+							{
+								type: "regExp[/^[a-zA-Z0-9_-]{4,16}$/]",
+								prompt: "Username can only contain letters and numbers"
+							}
+						]
+					},
+					Password:
+					{
+						identifier: "Password",
+						rules: [{ type: "minLength[3]" }]
+					}
+				}
+			});
+	</script>
+}

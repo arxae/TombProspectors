@@ -1,0 +1,106 @@
+﻿@{
+	ViewBag.Title = "New User Registration";
+	Layout = "_Layout";
+}
+
+<form id="registrationForm" class="ui form">
+	<div class="field">
+		<label>Username</label>
+		<input type="text" name="Username" placeholder="Username">
+	</div>
+
+	<div class="field">
+		<label>Password</label>
+		<input type="password" name="Password" placeholder="Password">
+	</div>
+
+	<div class="field">
+		<label>Password Confirmation</label>
+		<input type="password" name="PasswordConfirm" placeholder="Confirm password">
+	</div>
+
+	<div class="field">
+		<label>Email</label>
+		<input type="text" name="Email" placeholder="Email">
+	</div>
+
+	<div class="fluid ui buttons">
+		<button id="submitBtn" class="ui button primary" type="submit">Register</button>
+		<div class="or"></div>
+		<button class="ui button negative" type="reset">Reset</button>
+	</div>
+
+	<div class="ui error message"></div>
+	<div id="existingUserMsg" class="ui negative message" style="display:none">User or Email is already in use</div>
+</form>
+
+@section Script {
+	<script type="text/javascript">
+		$("#registrationForm").submit(function (e) {
+			e.preventDefault();
+
+			if ($("#registrationForm").form("is valid") === false) {
+				return;
+			}
+
+			$("#submitBtn").addClass("loading");
+
+			var user = {
+				UserName: $("[name=Username]").val(),
+				Password: $("[name=Password]").val(),
+				Email: $("[name=Email]").val()
+			};
+
+			$.ajax({
+				type: "POST",
+				url: "/account/new",
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				data: JSON.stringify(user),
+				success: function (data) {
+					if (data === "false") {
+						$("#existingUserMsg").show();
+						$("#submitBtn").removeClass("loading");
+					} else {
+						window.location.href = "/account/login";
+					}
+				}
+			});
+		});
+
+		$("#registrationForm")
+			.form({
+				on: "blur",
+				fields: {
+					Username: {
+						identifier: "Username",
+						rules:
+						[
+							{ type: "minLength[3]" },
+							{
+								type: "regExp[/^[a-zA-Z0-9_-]{4,16}$/]",
+								prompt: "Username can only contain letters and numbers"
+							}
+						]
+					},
+					Password:
+					{
+						identifier: "Password",
+						rules: [{ type: "minLength[3]" }]
+					},
+					PasswordConfirm:
+					{
+						identifier: "PasswordConfirm",
+						rules: [{ type: "match[Password]" }]
+					},
+					Email:
+					{
+						identifier: "Email",
+						rules: [{ type: "email" }]
+					}
+				}
+			});
+	</script>
+}

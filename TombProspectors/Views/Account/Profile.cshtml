@@ -1,0 +1,89 @@
+﻿@model TombProspectors.Controllers.AccountController.ProfileModel
+@{
+	Layout = "_Layout";
+	ViewBag.Title = $"Profile for {Model.User.UserName}";
+}
+
+<h3>Profile for @Model.User.UserName</h3>
+
+<ul class="ui list">
+	<li><b>Email:</b> @Model.User.Email</li>
+	<li><b>Joined:</b> @Model.User.Created</li>
+	<li><b>Last Login:</b> @Model.User.LastLogin</li>
+</ul>
+
+<h4>Profile History</h4>
+
+<div class="ui top attached tabular menu">
+	<a class="active item" data-tab="tab_glyphs">Glyphs</a>
+	<a class="item" data-tab="tab_hist">History</a>
+</div>
+<div class="ui bottom attached active tab segment" data-tab="tab_glyphs">
+	<table class="ui table">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Glyph</th>
+				<th>Short Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var entry in Model.History.Where(h => h.Action == "new_glyph"))
+			{
+				<tr>
+					<td>@entry.Created</td>
+					<td><a href="/dungeon/viewglyph/@entry.Target">@entry.Target</a></td>
+					<td>@Model.SubmittedGlyphs.First(s => s.Item1 == entry.Target).Item2</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+<div class="ui bottom attached tab segment" data-tab="tab_hist">
+	<table class="ui table">
+		<thead>
+			<tr>
+				<th>Date</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var entry in Model.History)
+			{
+				<tr>
+					<td>@entry.Created</td>
+					@if (entry.Action == "vote")
+					{
+						<td>
+							Voted for <a href="/dungeon/viewglyph/@entry.Target">@entry.Target</a>
+						</td>
+					}
+					else if (entry.Action == "created" && entry.Target == "account")
+					{
+						<td>Created account</td>
+					}
+					else if (entry.Action == "new_glyph")
+					{
+						<td>Submitted new glyph <a href="/dungeon/viewglyph/@entry.Target">@entry.Target</a></td>
+					}
+					else if (entry.Action == "comment")
+					{
+						<td>Commented on <a href="/dungeon/viewglyph/@entry.Target">@entry.Target</a></td>
+					}
+					else
+					{
+						<td>
+							@entry.Action -> @entry.Target
+						</td>
+					}
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+
+@section Script {
+	<script type="text/javascript">
+		$(".menu .item").tab();
+	</script>
+}
