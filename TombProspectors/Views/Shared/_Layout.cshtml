@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@{
+	var userRole = User.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
+}
+
+<!DOCTYPE html>
 <html class="no-js" lang="en">
 
 <head>
@@ -51,6 +55,22 @@
 						<a class="item" href="/account/logout">Logout</a>
 					</div>
 				</div>
+
+				if (userRole == "admin" || userRole == "moderator")
+				{
+					<div class="ui simple dropdown item">
+						<i class="spy icon"></i><i class="dropdown icon"></i>
+						<div class="menu">
+							@if (userRole == "admin")
+							{
+								<div class="header">Admin Options</div>
+								<div class="divider"></div>
+								<a class="item" href="/administration/newhomepageitem">New homepage item</a>
+								<a class="item">User management</a>
+							}
+						</div>
+					</div>
+				}
 			}
 			else
 			{

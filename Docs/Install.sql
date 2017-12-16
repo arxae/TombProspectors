@@ -72,6 +72,15 @@ CREATE TABLE [dbo].[Comments] (
 	Posted DATETIME2(0) NOT NULL
 ) ON [PRIMARY];
 
+CREATE TABLE [dbo].[Articles] (
+	Id INT PRIMARY KEY IDENTITY NOT NULL,
+	Section VARCHAR(100) NOT NULL,
+	Title VARCHAR(500) NOT NULL,
+	Content VARCHAR(MAX) NOT NULL,
+	PostedBy VARCHAR(50) NOT NULL,
+	Posted DATETIME2(0) NOT NULL
+) ON [PRIMARY];
+
 -- Bosses
 INSERT INTO Bosses VALUES('Abhorrent Beast',					'http://www.bloodborne-wiki.com/2015/03/abhorrent-beast.html',							GETDATE());
 INSERT INTO Bosses VALUES('Amygdala',							'http://www.bloodborne-wiki.com/2015/03/amygdala.html',									GETDATE());
@@ -230,3 +239,4 @@ INSERT INTO Loot VALUES('Tiny Tonitrus',				NULL,	'http://www.bloodborne-wiki.co
 
 -- Misc
 INSERT INTO Loot VALUES('Chalice Bath Messengers',		NULL,	'http://www.bloodborne-wiki.com/2015/04/chalice-bath-messengers.html',	GETDATE());
+INSERT INTO Loot VALUES('Oddity',						NULL,	NULL,																	GETDATE());

@@ -5,11 +5,6 @@
 }
 
 <div class="ui segment">
-	@*<div class="ui left rail">
-			<div class="ui segment">
-				Left Rail Content
-			</div>
-		</div>*@
 	<div class="ui right close rail">
 		<div class="ui segment">
 			<div class="ui message">
@@ -27,5 +22,32 @@
 	</div>
 	<div>
 		<h1 class="ui header">Tomb Prospectors <sub><small>(test)</small></sub></h1>
+		<hr />
+		<div class="ui items">
+			@foreach (var art in Model.Articles)
+			{
+				<div class="item">
+					<div class="content">
+						<a class="header" href="/viewpost/@art.Id">@art.Title</a>
+						<div class="meta">
+							<span>Posted by @art.PostedBy on @art.Posted</span>
+						</div>
+						<div class="description">
+							<p>
+								@Html.Raw(art.Content)
+							</p>
+						</div>
+						@if (User.HasClaim(c => c.Value == "admin"))
+						{
+							<div class="extra">
+								<a href="#">Remove</a>
+								<a href="#">Edit</a>
+							</div>
+						}
+					</div>
+				</div>
+				<div class="ui divider"></div>
+			}
+		</div>
 	</div>
 </div>

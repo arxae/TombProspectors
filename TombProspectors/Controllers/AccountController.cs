@@ -120,9 +120,6 @@
 				Response.Redirect(returnUrl);
 			}
 
-			//ViewBag.IncorrectLogin = true;
-			//return View();
-
 			return Content("false");
 		}
 

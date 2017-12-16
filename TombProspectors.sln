@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+VisualStudioVersion = 15.0.27130.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TombProspectors", "TombProspectors\TombProspectors.csproj", "{4C0E7DF1-EB95-4979-9F5D-043C9444F070}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{E0AA0D3F-AC1B-470E-BD93-D92EC52E62F0}"
 	ProjectSection(SolutionItems) = preProject
-		Docs\DefaultData.sql = Docs\DefaultData.sql
 		Docs\Install.sql = Docs\Install.sql
-		Docs\Tables.sql = Docs\Tables.sql
 	EndProjectSection
 EndProject
 Global

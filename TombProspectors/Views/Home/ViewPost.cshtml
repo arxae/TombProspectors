@@ -1,0 +1,21 @@
+﻿@model TombProspectors.Database.Models.Article
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "Viewing post - " + Model.Title;
+}
+
+<style>
+	.postData {
+		color: gray;
+	}
+</style>
+
+<h1 class="ui header">@Model.Title</h1>
+
+<div class="ui divider"></div>
+
+<p>
+	@Html.Raw(Model.Content)
+</p>
+
+<div class="postData"><span>Posted by @Model.PostedBy on @Model.Posted</span></div>

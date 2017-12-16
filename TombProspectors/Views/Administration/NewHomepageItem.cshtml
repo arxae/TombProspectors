@@ -1,0 +1,22 @@
+﻿@{
+	Layout = "_Layout";
+	ViewBag.Title = "New Homepage Item";
+}
+
+<form class="ui form" action="/administration/postnewhomepageitem" method="post">
+	<div class="field">
+		<label>Title</label>
+		<input type="text" name="Title" placeholder="Title">
+	</div>
+
+	<div class="field">
+		<label>Content</label>
+		<textarea rows="5" name="Content"></textarea>
+	</div>
+	
+	<div class="field">
+		<div>Submitting as <b>@User.Identity.Name</b></div>
+	</div>
+
+	<button class="ui button positive fluid" type="submit">Submit</button>
+</form>

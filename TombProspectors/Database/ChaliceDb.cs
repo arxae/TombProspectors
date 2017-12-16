@@ -19,6 +19,7 @@
 		public ITable<User> Users => GetTable<User>();
 		public ITable<UserHistory> UserHistory => GetTable<UserHistory>();
 		public ITable<Comment> Comments => GetTable<Comment>();
+		public ITable<Article> Articles => GetTable<Article>();
 
 		public static string NewGlyphFromModel(SubmitGlyphModel glyph)
 		{
