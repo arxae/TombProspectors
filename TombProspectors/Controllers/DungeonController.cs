@@ -1,6 +1,9 @@
-﻿namespace TombProspectors.Controllers
+﻿using SixLabors.ImageSharp;
+
+namespace TombProspectors.Controllers
 {
 	using System.Collections.Generic;
+	using System.IO;
 	using System.Linq;
 
 	using LinqToDB;
@@ -61,6 +64,18 @@
 
 				var usrname = HttpContext.User.Identity.Name;
 				model.HasVoted = db.UserHistory.Any(h => h.UserName == usrname && h.Action == "vote" && h.Target == glyph);
+
+				string ssDirPath = Path.Combine("wwwroot", "Screenshots", glyph);
+				if (Directory.Exists(ssDirPath))
+				{
+					string[] files = Directory.GetFiles(ssDirPath);
+
+					foreach (var file in files)
+					{
+						var fileName = Path.GetFileName(file);
+						model.Screenshots.Add(fileName);
+					}
+				}
 			}
 
 			ViewBag.CurrentGlyph = model.Dungeon.Glyph;
@@ -129,14 +144,57 @@
 			glyph.Submitter = HttpContext.User.Identity.Name;
 			glyph.Notes = sanitizer.Sanitize(glyph.Notes);
 
+			string[] validFileTypes = { "image/jpeg", "image/gif", "image/png" };
+			int index = 0;
+			foreach (var file in glyph.Screenshots)
+			{
+				if (file.Length <= 0) continue;
+
+				string ssDirPath = Path.Combine("wwwroot", "Screenshots", glyph.DungeonGlyph);
+				if (Directory.Exists(ssDirPath) == false)
+				{
+					Directory.CreateDirectory(ssDirPath);
+				}
+
+				// Save image
+				// Skip when not a image file
+				if (validFileTypes.Contains(file.ContentType) == false) continue;
+
+				string filePath = Path.Combine(ssDirPath, $"{index}.png");
+				string thumbPath = Path.Combine(ssDirPath, $"{index}-thumb.png");
+
+				using (var img = Image.Load<Rgba32>(file.OpenReadStream()))
+				{
+					// Main image
+					using (var output = System.IO.File.OpenWrite(filePath))
+					{
+						if (img.Width > 1920 || img.Height > 1080)
+						{
+							img.Mutate(i => i.Resize(1920, 1080));
+						}
+
+						img.SaveAsPng(output);
+					}
+
+					// Thumbnail
+					using (var output = System.IO.File.OpenWrite(thumbPath))
+					{
+						img.Mutate(i => i.Resize(256, 128));
+						img.SaveAsPng(output);
+					}
+				}
+
+				index++;
+			}
+
 			string res = ChaliceDb.NewGlyphFromModel(glyph);
 
 			if (res == "<EXISTS>")
 			{
-				return View("_Error", "This glyph already exists");
+				return View("_Error", "This glyph alreadt exists");
 			}
 
-			return Redirect($"/dungeon/viewglyph/{res}");
+			return Redirect($"/dungeon/viewghlyph/{res}");
 		}
 
 		[HttpPost]
@@ -231,7 +289,7 @@
 			var model = ChaliceDb.SearchGlyph(query, searchType);
 			ViewBag.SearchQuery = query;
 			ViewBag.SearchType = searchType;
-			
+
 			return View(model);
 		}
 
@@ -256,12 +314,14 @@
 			public List<Loot> Loot;
 			public string RootChaliceDisplayName;
 			public bool HasVoted;
+			public List<string> Screenshots;
 
 			public ViewGlyphModel()
 			{
 				Bosses = new List<DungeonBoss>();
 				Loot = new List<Loot>();
 				HasVoted = false;
+				Screenshots = new List<string>();
 			}
 		}
 

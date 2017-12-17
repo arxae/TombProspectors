@@ -5,6 +5,7 @@
 }
 
 @section Head {
+	<link rel="stylesheet" type="text/css" href="~/lib/fancybox/jquery.fancybox.min.css" />
 	<style>
 		.submitData {
 			font-style: italic;
@@ -144,17 +145,25 @@
 
 		@if (Model.Dungeon.Submitter == User.Identity.Name)
 		{
-			<span class="submitData">You</span>
+			<a href="/account/profile" class="submitData">You</a>
 		}
 		else
 		{
-			<span class="submitData">@Model.Dungeon.Submitter</span>
+			<a href="/account/viewprofile/@Model.Dungeon.Submitter" class="submitData">@Model.Dungeon.Submitter</a>
 		}
 
 	</p>
 </div>
 <div class="ui bottom attached tab segment" data-tab="tab_images">
-	<b>IMAGES HERE</b>
+	@foreach (var img in Model.Screenshots)
+	{
+		if (img.EndsWith("-thumb.png") == false)
+		{
+			<a href="~/Screenshots/@Model.Dungeon.Glyph/@img" class="screenshotThumb" data-fancybox data-options='{"animationEffect":"fade"}'>
+				<img src="~/Screenshots/@Model.Dungeon.Glyph/@img" height="128" widht="256" />
+			</a>
+		}
+	}
 </div>
 <div class="ui bottom attached tab segment" data-tab="tab_comments">
 	<div id="commentsAnchor"></div>
@@ -164,6 +173,7 @@
 <input id="dungData" type="hidden" data-glyph="@Model.Dungeon.Glyph" />
 
 @section Script {
+	<script type="text/javascript" src="~/lib/fancybox/jquery.fancybox.min.js"></script>
 	<script type="text/javascript" src="~/js/showdown.min.js"></script>
 	<script type="text/javascript">
 		$("#upvoteBtn").on("click", function () { sendVote("up") });

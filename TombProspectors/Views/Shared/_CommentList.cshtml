@@ -10,7 +10,7 @@
 					<img src="http://placekitten.com/g/128/128">
 				</a>
 				<div class="content">
-					<a class="author">@comment.PostedBy</a>
+					<a class="author" href="/account/viewprofile/@comment.PostedBy">@comment.PostedBy</a>
 					<div class="metadata">
 						<span class="date">@comment.Posted</span>
 					</div>
@@ -34,14 +34,17 @@
 		</div>
 	}
 
-	<form class="ui reply form">
-		<div class="field">
-			<textarea id="commentinput"></textarea>
-		</div>
-		<div id="submitCommentBtn" class="ui blue labeled icon button">
-			<i class="icon edit"></i> Add Comment
-		</div>
-	</form>
+	@if (User.Identity.IsAuthenticated)
+	{
+		<form class="ui reply form">
+			<div class="field">
+				<textarea id="commentinput"></textarea>
+			</div>
+			<div id="submitCommentBtn" class="ui blue labeled icon button">
+				<i class="icon edit"></i> Add Comment
+			</div>
+		</form>
+	}
 </div>
 
 <script type="text/javascript">

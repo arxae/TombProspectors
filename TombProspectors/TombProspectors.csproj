@@ -15,6 +15,7 @@
 		<PackageReference Include="linq2db.Core" Version="1.10.1" />
 		<PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.0.1" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0002" />
 	</ItemGroup>
 
 	<ItemGroup>

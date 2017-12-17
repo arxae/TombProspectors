@@ -15,7 +15,9 @@
 				<div class="header">Most Submissions</div>
 				@if (Model.MostSubmissions != null)
 				{
-					<p>@Model.MostSubmissions.Item1 with @Model.MostSubmissions.Item2 glyphs</p>
+					<p>
+						<a href="/account/viewprofile/@Model.MostSubmissions.Item1">@Model.MostSubmissions.Item1</a> with @Model.MostSubmissions.Item2 glyphs
+					</p>
 				}
 			</div>
 		</div>

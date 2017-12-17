@@ -46,6 +46,11 @@
 		[HttpGet]
 		public IActionResult Profile()
 		{
+			if (User.Identity.IsAuthenticated == false)
+			{
+				return View("_Error", "You are not logged in");
+			}
+
 			var model = new ProfileModel
 			{
 				User = Database.ChaliceDb.GetUserByUsername(HttpContext.User.Identity.Name),
@@ -67,7 +72,43 @@
 					.ToList();
 			}
 
+			model.IsOwnProfile = true;
+
 			return View(model);
+		}
+
+		[HttpGet("/account/viewprofile/{username}")]
+		public IActionResult ViewProfile(string username)
+		{
+			var model = new ProfileModel
+			{
+				User = Database.ChaliceDb.GetUserByUsername(username),
+				History = Database.ChaliceDb.GetUserHistory(username)
+			};
+
+			using (var db = new Database.ChaliceDb())
+			{
+				model.User = db.Users.FirstOrDefault(u => u.UserName == username);
+
+				if (model.User == null)
+				{
+					return View("_Error", "User not found");
+				}
+
+				model.History = db.UserHistory
+					.Where(u => u.UserName == username)
+					.OrderBy(u => u.Created)
+					.ToList();
+
+				model.SubmittedGlyphs = db.DungeonGlyphs
+					.Where(d => d.Submitter == username)
+					.Select(d => new System.Tuple<string, string>(d.Glyph, d.ShortDescription))
+					.ToList();
+			}
+
+			model.IsOwnProfile = false;
+
+			return View("Profile", model);
 		}
 
 		[HttpPost]
@@ -154,6 +195,7 @@
 			public User User { get; set; }
 			public IEnumerable<UserHistory> History { get; set; }
 			public List<System.Tuple<string, string>> SubmittedGlyphs { get; set; }
+			public bool IsOwnProfile { get; set; }
 		}
 	}
 }

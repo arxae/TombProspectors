@@ -6,11 +6,14 @@
 
 <h3>Profile for @Model.User.UserName</h3>
 
-<ul class="ui list">
-	<li><b>Email:</b> @Model.User.Email</li>
-	<li><b>Joined:</b> @Model.User.Created</li>
-	<li><b>Last Login:</b> @Model.User.LastLogin</li>
-</ul>
+@if (Model.IsOwnProfile)
+{
+	<ul class="ui list">
+		<li><b>Email:</b> @Model.User.Email</li>
+		<li><b>Joined:</b> @Model.User.Created</li>
+		<li><b>Last Login:</b> @Model.User.LastLogin</li>
+	</ul>
+}
 
 <h4>Profile History</h4>
 

@@ -1,5 +1,8 @@
 ﻿namespace TombProspectors.Controllers.Models
 {
+	using System.Collections.Generic;
+	using Microsoft.AspNetCore.Http;
+
 	public class SubmitGlyphModel
 	{
 		public string DungeonGlyph { get; set; }
@@ -15,5 +18,6 @@
 		public string Notes { get; set; }
 		public string[] Loot { get; set; }
 		public string Submitter { get; set; }
+		public List<IFormFile> Screenshots { get; set; }
 	}
 }

@@ -4,7 +4,7 @@
 	ViewBag.Title = "Submit new glyph";
 }
 
-<form id="newGlyphForm" class="ui form" action="/dungeon/SubmitNewGlyph" method="post">
+<form id="newGlyphForm" class="ui form" action="/dungeon/SubmitNewGlyph" method="post" enctype="multipart/form-data">
 	<div class="ui error message"></div>
 	<div class="field">
 		<label>Dungeon Glyph</label>
@@ -18,17 +18,6 @@
 
 	<div class="two fields">
 		<div class="field">
-			@*<div class="ui selection dropdown">
-					<input type="hidden" name="RootChalice">
-					<i class="dropdown icon"></i>
-					<div class="default text">Root Chalice</div>
-					<div class="menu">
-						@foreach (var chalice in Model.RootChalices)
-						{
-							<div class="item" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
-						}
-					</div>
-				</div>*@
 			<select name="RootChalice" class="ui fluid selection search dropdown">
 				<option value="">Select Chalice</option>
 				@foreach (var c in Model.RootChalices)
@@ -61,28 +50,28 @@
 			<div class="ui checkbox">
 				<input type="checkbox" id="fetidCh" />
 				@Html.Hidden("Fetid")
-				<label>Fetid</label>
+				<label for="fetidCh">Fetid</label>
 			</div>
 		</div>
 		<div class="field">
 			<div class="ui checkbox">
 				<input type="checkbox" id="rottedCh">
 				@Html.Hidden("Rotted")
-				<label>Rotted</label>
+				<label for="rottedCh">Rotted</label>
 			</div>
 		</div>
 		<div class="field">
 			<div class="ui checkbox">
 				<input type="checkbox" id="cursedCh">
 				@Html.Hidden("Cursed")
-				<label>Cursed</label>
+				<label for="cursedCh">Cursed</label>
 			</div>
 		</div>
 		<div class="field">
 			<div class="ui checkbox">
 				<input type="checkbox" id="sinisterCh">
 				@Html.Hidden("Sinister")
-				<label>Sinister</label>
+				<label for="sinisterCh">Sinister</label>
 			</div>
 		</div>
 	</div>
@@ -93,7 +82,7 @@
 			<div class="ui checkbox">
 				<input type="checkbox" id="saveEditedCh" />
 				@Html.Hidden("SaveEdited")
-				<label></label>
+				<label for="saveEditedCh"></label>
 			</div>
 		</div>
 	</div>
@@ -120,19 +109,25 @@
 	</div>
 
 	<div class="field">
+		<label>Screenshots</label>
+		<input id="screenshotInput" type="file" name="Screenshots" accept=".jpg,.jpeg,.png,.gif" multiple />
+	</div>
+
+	<div class="field">
 		<label>Notes</label>
 		<textarea rows="5" name="Notes" placeholder="Notes"></textarea>
 	</div>
 
 	<div class="fluid ui buttons">
 		<button type="submit" class="ui button primary">Submit</button>
-		<div class="or"></div>
 		<button type="reset" class="ui button negative">Reset</button>
 	</div>
 </form>
 
 @section Script {
 	<script type="text/javascript">
+		var validImages = false;
+
 		$(document).ready(function () {
 			$(".ui.dropdown").dropdown();
 			$(".allowAdditions").dropdown({
@@ -140,12 +135,33 @@
 			});
 
 			// Prevent form submission on enter (happens when adding custom loot)
-			$(document).on("keydown", function (e) {
-				if (e.which === 13 && !$(e.target).is("textarea")) {
-					e.preventDefault();
-					return;
-				}
-			});
+			$(document).on("keydown",
+				function (e) {
+					if (e.which === 13 && !$(e.target).is("textarea")) {
+						e.preventDefault();
+						return;
+					}
+				});
+
+			$("#screenshotInput").on("change",
+				function () {
+					var valid = [];
+					for (var i = 0; i < this.files.length; i++) {
+						var file = this.files[i];
+						var fileType = file["type"];
+						if ($.inArray(fileType, ["image/jpeg", "image/gif", "image/png"]) < 0) {
+							valid.push(false);
+						} else {
+							valid.push(true);
+						}
+					}
+
+					validImages = allTrue(valid);
+
+					if (validImages === false) {
+						alert("Some selected files are not valid and will be ignored");
+					}
+				});
 		});
 
 		// Sync checkboxes with hidden input field
@@ -188,9 +204,17 @@
 			});
 
 		$("#newGlyphForm").submit(function (e) {
-			if ($("#newGlyphForm").form("is valid") == false) {
+			if ($("#newGlyphForm").form("is valid") === false) {
 				e.preventDefault();
 			}
 		});
+
+		function allTrue(obj) {
+			for (var o in obj) {
+				if (obj[o] === false || obj[o] === "false") {
+					return false;
+				}
+			}
+		}
 	</script>
 }
