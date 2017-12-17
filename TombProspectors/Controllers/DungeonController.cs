@@ -144,47 +144,50 @@ namespace TombProspectors.Controllers
 			glyph.Submitter = HttpContext.User.Identity.Name;
 			glyph.Notes = sanitizer.Sanitize(glyph.Notes);
 
-			string[] validFileTypes = { "image/jpeg", "image/gif", "image/png" };
-			int index = 0;
-			foreach (var file in glyph.Screenshots)
+			if (glyph.Screenshots != null)
 			{
-				if (file.Length <= 0) continue;
-
-				string ssDirPath = Path.Combine("wwwroot", "Screenshots", glyph.DungeonGlyph);
-				if (Directory.Exists(ssDirPath) == false)
+				string[] validFileTypes = { "image/jpeg", "image/gif", "image/png" };
+				int index = 0;
+				foreach (var file in glyph.Screenshots)
 				{
-					Directory.CreateDirectory(ssDirPath);
-				}
+					if (file.Length <= 0) continue;
 
-				// Save image
-				// Skip when not a image file
-				if (validFileTypes.Contains(file.ContentType) == false) continue;
-
-				string filePath = Path.Combine(ssDirPath, $"{index}.png");
-				string thumbPath = Path.Combine(ssDirPath, $"{index}-thumb.png");
-
-				using (var img = Image.Load<Rgba32>(file.OpenReadStream()))
-				{
-					// Main image
-					using (var output = System.IO.File.OpenWrite(filePath))
+					string ssDirPath = Path.Combine("wwwroot", "Screenshots", glyph.DungeonGlyph);
+					if (Directory.Exists(ssDirPath) == false)
 					{
-						if (img.Width > 1920 || img.Height > 1080)
+						Directory.CreateDirectory(ssDirPath);
+					}
+
+					// Save image
+					// Skip when not a image file
+					if (validFileTypes.Contains(file.ContentType) == false) continue;
+
+					string filePath = Path.Combine(ssDirPath, $"{index}.png");
+					string thumbPath = Path.Combine(ssDirPath, $"{index}-thumb.png");
+
+					using (var img = Image.Load<Rgba32>(file.OpenReadStream()))
+					{
+						// Main image
+						using (var output = System.IO.File.OpenWrite(filePath))
 						{
-							img.Mutate(i => i.Resize(1920, 1080));
+							if (img.Width > 1920 || img.Height > 1080)
+							{
+								img.Mutate(i => i.Resize(1920, 1080));
+							}
+
+							img.SaveAsPng(output);
 						}
 
-						img.SaveAsPng(output);
+						// Thumbnail
+						using (var output = System.IO.File.OpenWrite(thumbPath))
+						{
+							img.Mutate(i => i.Resize(256, 128));
+							img.SaveAsPng(output);
+						}
 					}
 
-					// Thumbnail
-					using (var output = System.IO.File.OpenWrite(thumbPath))
-					{
-						img.Mutate(i => i.Resize(256, 128));
-						img.SaveAsPng(output);
-					}
+					index++;
 				}
-
-				index++;
 			}
 
 			string res = ChaliceDb.NewGlyphFromModel(glyph);
@@ -194,7 +197,7 @@ namespace TombProspectors.Controllers
 				return View("_Error", "This glyph alreadt exists");
 			}
 
-			return Redirect($"/dungeon/viewghlyph/{res}");
+			return Redirect($"/dungeon/viewglyph/{res}");
 		}
 
 		[HttpPost]
