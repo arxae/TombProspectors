@@ -215,6 +215,7 @@ namespace TombProspectors.Controllers
 		[HttpPost]
 		public bool SubmitVote([FromBody] VotePackageModel vote)
 		{
+			bool rebuildGlyphVotes = false;
 			using (var db = new ChaliceDb())
 			{
 				db.BeginTransaction();
@@ -229,20 +230,31 @@ namespace TombProspectors.Controllers
 				{
 					glyph.Downvotes += 1;
 				}
-
-				db.Update(glyph);
-
-				var user = HttpContext.User.Identity.Name;
-				db.InsertWithIdentity(new UserHistory
+				else if (string.Equals(vote.Vote, "retract", System.StringComparison.OrdinalIgnoreCase))
 				{
-					UserName = user,
-					Action = "vote",
-					Target = vote.Glyph,
-					Value = vote.Vote,
-					Created = System.DateTime.Now
-				});
+					// Remove vote + rebuild glyph
+					db.UserHistory.Delete(h => h.UserName == User.Identity.Name && h.Target == vote.Glyph && h.Action == "vote");
+					rebuildGlyphVotes = true;
+				}
+
+				if (string.Equals(vote.Vote, "retract", System.StringComparison.OrdinalIgnoreCase) == false)
+				{
+					db.Update(glyph);
+
+					var user = HttpContext.User.Identity.Name;
+					db.InsertWithIdentity(new UserHistory
+					{
+						UserName = user,
+						Action = "vote",
+						Target = vote.Glyph,
+						Value = vote.Vote,
+						Created = System.DateTime.Now
+					});
+				}
 
 				db.CommitTransaction();
+
+				if (rebuildGlyphVotes) { ChaliceDb.RebuildGlyphVotes(vote.Glyph); }
 			}
 
 			return true;

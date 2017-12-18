@@ -272,5 +272,17 @@
 					.ToList();
 			}
 		}
+
+		/// <summary>
+		/// Recounts the amount of up and downvotes for a glyph and updates the data
+		/// </summary>
+		/// <param name="glyph"></param>
+		public static void RebuildGlyphVotes(string glyph)
+		{
+			using (var db = new ChaliceDb())
+			{
+				var result = db.Query<int>($"WITH Votes (Up, Down) AS (SELECT  COALESCE(SUM(CASE WHEN [Value] = 'up' THEN 1 ELSE 0 END), 1) AS Up, COALESCE(SUM(CASE WHEN [Value] = 'down' THEN 1 ELSE 0 END), 0) AS Down FROM UserHistory WHERE [Target] = '{glyph}' AND [Action] = 'vote') UPDATE DungeonGlyphs SET Upvotes = (SELECT Up FROM Votes), Downvotes = (SELECT Down FROM Votes) WHERE Glyph = '{glyph}'");
+			}
+		}
 	}
 }
