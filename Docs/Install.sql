@@ -58,6 +58,7 @@ CREATE TABLE [dbo].[DungeonGlyphs] (
 	Submitter VARCHAR(50) NOT NULL,
 	Upvotes INT NOT NULL DEFAULT(1),
 	Downvotes INT NOT NULL DEFAULT(0),
+	ClosedVotes INT NOT NULL DEFAULT(0),
 	Updated DATETIME2(0) NOT NULL
 ) ON [PRIMARY];
 

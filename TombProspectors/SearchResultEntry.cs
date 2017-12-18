@@ -10,6 +10,7 @@
 		public string Submitter { get; set; }
 		public int Upvotes { get; set; }
 		public int Downvotes { get; set; }
+		public int Closedvotes { get; set; }
 		public DateTime Updated { get; set; }
 	}
 }

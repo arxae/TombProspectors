@@ -48,7 +48,7 @@
 			<a href="#" id="markAsClosedBtn" data-tooltip="Dungeon is no longer active"><i class="ban icon"></i></a>
 		}
 		@*User already voted, show retract button*@
-		else if (User.Identity.IsAuthenticated && Model.HasVoted == true)
+		else if (User.Identity.IsAuthenticated && Model.HasVoted)
 		{
 			<a href="#" id="retractVoteBtn" data-tooltip="Remove your vote"><i class="radio icon"></i></a>
 		}
@@ -63,7 +63,7 @@
 			<div class="header">
 				Warning
 			</div>
-			<p>At least one person voted this dungeon as no longer available</p>
+			<p>At least one person voted this dungeon as no longer available. You can still vote, but votes and rating will no longer be displayed</p>
 		</div>
 	</div>
 }

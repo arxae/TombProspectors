@@ -18,6 +18,13 @@
 	}
 </style>
 
+@if (Model.Any(d => d.Closedvotes > 0))
+{
+	<div class="ui warning message">
+		There where closed dungeons in the search results, these have been ignored
+	</div>
+}
+
 <table class="ui table">
 	<thead>
 		<tr>
@@ -30,7 +37,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var item in Model.OrderByDescending(d => d.Upvotes - d.Downvotes))
+		@foreach (var item in Model.OrderByDescending(d => d.Upvotes - d.Downvotes).Where(d => d.Closedvotes == 0))
 		{
 			<tr>
 				<td><a href="/dungeon/viewglyph/@item.Glyph">@item.Glyph</a></td>
@@ -68,7 +75,9 @@
 							<span class="@ratingClass">@ratingString</span>
 							@if (ratio == 1.0 && newGlyph == false)
 							{
-								<i class="perfectRating star icon"></i>
+								<a href="#" data-tooltip="Dungeon has a perfect rating">
+									<i class="perfectRating star icon"></i>
+								</a>
 							}
 						</div>
 					</div>

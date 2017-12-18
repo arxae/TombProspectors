@@ -45,6 +45,7 @@
 						Submitter = g.Submitter,
 						Upvotes = g.Upvotes,
 						Downvotes = g.Downvotes,
+						Closedvotes = g.ClosedVotes,
 						Updated = g.Updated
 					});
 				}
@@ -87,6 +88,7 @@
 						Submitter = g.Submitter,
 						Upvotes = g.Upvotes,
 						Downvotes = g.Downvotes,
+						Closedvotes = g.ClosedVotes,
 						Updated = g.Updated
 					});
 				}
@@ -144,6 +146,7 @@
 						Submitter = g.Submitter,
 						Upvotes = g.Upvotes,
 						Downvotes = g.Downvotes,
+						Closedvotes = g.ClosedVotes,
 						Updated = g.Updated
 					});
 				}
@@ -151,6 +154,5 @@
 
 			return PartialView("Lists/_GlyphsResultView", resultList);
 		}
-
 	}
 }
