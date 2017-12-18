@@ -28,17 +28,24 @@
 <span>@Model.Dungeon.ShortDescription</span>
 <br />
 
-<div class="ui mini statistic">
+<div class="ui mini statistic" style="margin-bottom:4px;">
 	<div class="value">
-		<span class="upvoteData">+@Model.Dungeon.Upvotes</span> / <span class="downvoteData">-@Model.Dungeon.Downvotes</span>
+		@if (Model.Dungeon.ClosedVotes > 0)
+		{
+			<span class="upvoteData">-</span> @Html.Raw("/"); <span class="downvoteData">-</span>
+		}
+		else
+		{
+			<span class="upvoteData">+@Model.Dungeon.Upvotes</span> @Html.Raw("/"); <span class="downvoteData">-@Model.Dungeon.Downvotes</span>
+		}
 	</div>
 	<div class="label">
-		Rating
 		@*Allow rating when user is logged in and not the submitter*@
 		@if (User.Identity.IsAuthenticated && Model.HasVoted == false && User.Identity.Name != Model.Dungeon.Submitter)
 		{
 			<a href="#" id="upvoteBtn" data-tooltip="Vote Up"><i class="thumbs up icon"></i></a>
 			<a href="#" id="downvoteBtn" data-tooltip="Vote Down"><i class="thumbs down icon"></i></a>
+			<a href="#" id="markAsClosedBtn" data-tooltip="Dungeon is no longer active"><i class="ban icon"></i></a>
 		}
 		@*User already voted, show retract button*@
 		else if (User.Identity.IsAuthenticated && Model.HasVoted == true)
@@ -48,6 +55,18 @@
 	</div>
 </div>
 
+@if (Model.Dungeon.ClosedVotes > 0)
+{
+	<div class="ui error icon message" style="margin-top:0px;">
+		<i class="warning sign icon"></i>
+		<div class="content">
+			<div class="header">
+				Warning
+			</div>
+			<p>At least one person voted this dungeon as no longer available</p>
+		</div>
+	</div>
+}
 
 <div class="ui top attached tabular menu">
 	<a class="item active" data-tab="tab_glyph">Glyph</a>
@@ -185,6 +204,7 @@
 		$("#upvoteBtn").on("click", function () { sendVote("up") });
 		$("#downvoteBtn").on("click", function () { sendVote("down") });
 		$("#retractVoteBtn").on("click", function () { sendVote("retract") });
+		$("#markAsClosedBtn").on("click", function () { sendVote("closed") });
 
 		$(document).ready(function() {
 			var mdConverter = new showdown.Converter();

@@ -215,36 +215,57 @@ namespace TombProspectors.Controllers
 		[HttpPost]
 		public bool SubmitVote([FromBody] VotePackageModel vote)
 		{
-			bool rebuildGlyphVotes = false;
 			using (var db = new ChaliceDb())
 			{
 				db.BeginTransaction();
 
 				var glyph = db.DungeonGlyphs.FirstOrDefault(d => d.Glyph == vote.Glyph);
-
-				if (string.Equals(vote.Vote, "up", System.StringComparison.OrdinalIgnoreCase))
+				switch (vote.Vote.ToLower())
 				{
-					glyph.Upvotes += 1;
+					case "up":
+						glyph.Upvotes += 1;
+						break;
+					case "down":
+						glyph.Downvotes += 1;
+						break;
+					case "retract":
+						{
+							var prevVote = db.UserHistory.FirstOrDefault(h => h.UserName == User.Identity.Name && h.Target == vote.Glyph && h.Action == "vote");
+							switch (prevVote.Value)
+							{
+								case "up": glyph.Upvotes -= 1; break;
+								case "down": glyph.Downvotes -= 1; break;
+								case "closed": glyph.ClosedVotes -= 1; break;
+							}
+							db.Delete(prevVote);
+						}
+						break;
+					case "closed":
+						{
+							// Delete previous vote if needed
+							var prevVote = db.UserHistory.FirstOrDefault(h => h.UserName == User.Identity.Name && h.Target == vote.Glyph && h.Action == "vote");
+							if (prevVote != null)
+							{
+								switch (prevVote.Value)
+								{
+									case "up": glyph.Upvotes -= 1; break;
+									case "down": glyph.Downvotes -= 1; break;
+								}
+								db.Delete(prevVote);
+							}
+							glyph.ClosedVotes += 1;
+						}
+						break;
 				}
-				else if (string.Equals(vote.Vote, "down", System.StringComparison.OrdinalIgnoreCase))
-				{
-					glyph.Downvotes += 1;
-				}
-				else if (string.Equals(vote.Vote, "retract", System.StringComparison.OrdinalIgnoreCase))
-				{
-					// Remove vote + rebuild glyph
-					db.UserHistory.Delete(h => h.UserName == User.Identity.Name && h.Target == vote.Glyph && h.Action == "vote");
-					rebuildGlyphVotes = true;
-				}
 
-				if (string.Equals(vote.Vote, "retract", System.StringComparison.OrdinalIgnoreCase) == false)
-				{
-					db.Update(glyph);
+				db.Update(glyph);
 
-					var user = HttpContext.User.Identity.Name;
+				// Don't write history for vote retraction
+				if (vote.Vote.ToLower() != "retract")
+				{
 					db.InsertWithIdentity(new UserHistory
 					{
-						UserName = user,
+						UserName = User.Identity.Name,
 						Action = "vote",
 						Target = vote.Glyph,
 						Value = vote.Vote,
@@ -253,8 +274,6 @@ namespace TombProspectors.Controllers
 				}
 
 				db.CommitTransaction();
-
-				if (rebuildGlyphVotes) { ChaliceDb.RebuildGlyphVotes(vote.Glyph); }
 			}
 
 			return true;

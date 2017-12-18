@@ -54,6 +54,9 @@
 		public int Downvotes { get; set; }
 
 		[Column, NotNull]
+		public int ClosedVotes { get; set; }
+
+		[Column, NotNull]
 		public System.DateTime Updated { get; set; }
 
 		public List<DungeonBoss> GetBossObjects()

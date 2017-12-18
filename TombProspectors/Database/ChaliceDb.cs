@@ -284,5 +284,15 @@
 				var result = db.Query<int>($"WITH Votes (Up, Down) AS (SELECT  COALESCE(SUM(CASE WHEN [Value] = 'up' THEN 1 ELSE 0 END), 1) AS Up, COALESCE(SUM(CASE WHEN [Value] = 'down' THEN 1 ELSE 0 END), 0) AS Down FROM UserHistory WHERE [Target] = '{glyph}' AND [Action] = 'vote') UPDATE DungeonGlyphs SET Upvotes = (SELECT Up FROM Votes), Downvotes = (SELECT Down FROM Votes) WHERE Glyph = '{glyph}'");
 			}
 		}
+
+		public static void RemoveVote(UserHistory voteEntry)
+		{
+			using (var db = new ChaliceDb())
+			{
+				db.BeginTransaction();
+				db.Delete(voteEntry);
+				db.CommitTransaction();
+			}
+		}
 	}
 }

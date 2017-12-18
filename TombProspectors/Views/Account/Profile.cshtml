@@ -58,7 +58,14 @@
 					@if (entry.Action == "vote")
 					{
 						<td>
-							Voted for <a href="/dungeon/viewglyph/@entry.Target">@entry.Target</a>
+							@if (entry.Value == "closed")
+							{
+								<span>Marked <a href="/dungeon/viewglyph/@entry.Target">@entry.Target</a> as closed</span>
+							}
+							else
+							{
+								<span>Voted for on <a href="/dungeon/viewglyph/@entry.Target">@entry.Target</a></span>
+							}
 						</td>
 					}
 					else if (entry.Action == "created" && entry.Target == "account")
