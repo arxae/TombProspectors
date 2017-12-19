@@ -55,7 +55,6 @@
 		</div>
 	</div>
 </div>
-
 <div id="results">
 	<div id="resultsAnchor"></div>
 </div>
@@ -70,6 +69,7 @@
 					return;
 				}
 
+
 				var rites = [];
 				if ($("#fetidCh").prop("checked")) { rites.push("fetid"); }
 				if ($("#rottedCh").prop("checked")) { rites.push("rotted"); }
@@ -83,9 +83,13 @@
 
 				var link = "/lists/LoadGlyphsByRootChalice?chaliceId=" + dropdownVal + "&rites=" + rites.join(",");
 
+				$("#chaliceSearchBtn").addClass("loading");
+				$("#chaliceSearchBtn").addClass("disabled");
+
 				$.get(link, function (data) {
-					console.log(link);
 					$("#resultsAnchor").html(data);
+					$("#chaliceSearchBtn").removeClass("loading");
+					$("#chaliceSearchBtn").removeClass("disabled");
 				});
 			});
 		});

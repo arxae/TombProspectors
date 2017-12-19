@@ -22,15 +22,15 @@
 	</style>
 }
 
-<h1 class="ui huge sub header">
+<h2 class="ui huge header">
 	Viewing Glyph <i>@Model.Dungeon.Glyph</i>
-</h1>
+</h2>
 <span>@Model.Dungeon.ShortDescription</span>
 <br />
 
 <div class="ui mini statistic" style="margin-bottom:4px;">
 	<div class="value">
-		@if (Model.Dungeon.ClosedVotes > 0)
+		@if (Model.Dungeon.ClosedVotes > 2)
 		{
 			<span class="upvoteData">-</span> @Html.Raw("/"); <span class="downvoteData">-</span>
 		}
@@ -55,7 +55,7 @@
 	</div>
 </div>
 
-@if (Model.Dungeon.ClosedVotes > 0)
+@if (Model.Dungeon.ClosedVotes > 2)
 {
 	<div class="ui error icon message" style="margin-top:0px;">
 		<i class="warning sign icon"></i>
@@ -63,7 +63,7 @@
 			<div class="header">
 				Warning
 			</div>
-			<p>At least one person voted this dungeon as no longer available. You can still vote, but votes and rating will no longer be displayed</p>
+			<p> This dungeon currently has @Model.Dungeon.ClosedVotes. Votes will still be registered, but rating will not longer be available.</p>
 		</div>
 	</div>
 }
@@ -195,6 +195,11 @@
 	<div id="commentsLoaderIndicator" class="ui active centered inline text loader">Getting comments</div>
 </div>
 
+<div class="ui buttons">
+	<button id="admDeleteGlyphBtn" class="ui button">Delete Glyph</button>
+	<button id="admRebuildVotesBtn" class="ui button">Rebuild Votes</button>
+</div>
+
 <input id="dungData" type="hidden" data-glyph="@Model.Dungeon.Glyph" />
 
 @section Script {
@@ -243,6 +248,38 @@
 					discussionLoaded = true;
 				});
 			}
+		});
+
+		/*
+		admDeleteGlyphBtn
+		admRebuildVotesBtn
+		*/
+
+		$("#admDeleteGlyphBtn").on("click", function () {
+			var glyph = $("#dungData").data("glyph");
+
+			alertify.confirm("Confirm", "Are you sure you want to delete the glyph " + glyph,
+				function () {
+					// Yes
+					$("#admDeleteGlyphBtn").addClass("disabled");
+
+					$.ajax({
+						type: "POST",
+						url: "/administration/deleteglyph",
+						headers: {
+							"Accept": "application/json",
+							"Content-Type": "application/json"
+						},
+						data: JSON.stringify(glyph),
+						success: function (e) {
+							if (e === "deleted") {
+								alert(glyph + " has been deleted.");
+								window.location.href = "/";
+							}
+						}
+					});
+				},
+				function () { }).set("labels", { ok: "Yes", cancel: "No" });
 		});
 	</script>
 }

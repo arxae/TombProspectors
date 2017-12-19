@@ -50,6 +50,29 @@
 			return Redirect("/");
 		}
 
+		[Authorize]
+		[HttpPost]
+		public IActionResult DeleteGlyph([FromBody] string glyphId)
+		{
+			if (User.HasClaim(c => c.Value == "admin" || c.Value == "mod") == false)
+			{
+				return View("_Error", "You are not authorized to do this");
+			}
+
+			// Delete glyph and associated history items (created + votes)
+			//using (var db = new ChaliceDb())
+			//{
+			//	db.BeginTransaction();
+
+			//	db.DungeonGlyphs.Delete(d => d.Glyph == glyphId);
+			//	db.UserHistory.Delete(h => h.Target == glyphId);
+
+			//	db.CommitTransaction();
+			//}
+
+			return Ok("deleted");
+		}
+
 		public class HomePageItem
 		{
 			public string Title { get; set; }

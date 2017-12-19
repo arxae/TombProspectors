@@ -31,7 +31,7 @@
 			{
 				var glyphs = db
 					.Query<DungeonGlyph>(
-						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Loot) + ';') LIKE '%;{lootId};%'")
+						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Upvotes, Downvotes, Closedvotes, Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Loot) + ';') LIKE '%;{lootId};%'")
 					.ToList();
 
 				foreach (var g in glyphs)
@@ -74,7 +74,7 @@
 			{
 				var glyphs = db
 					.Query<DungeonGlyph>(
-						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Bosses) + ';') LIKE '%;{bossId};%'")
+						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Upvotes, Downvotes, Closedvotes Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Bosses) + ';') LIKE '%;{bossId};%'")
 					.ToList();
 
 				foreach (var g in glyphs)

@@ -18,7 +18,7 @@
 	}
 </style>
 
-@if (Model.Any(d => d.Closedvotes > 0))
+@if (Model.Any(d => d.Closedvotes > 3))
 {
 	<div class="ui warning message">
 		There where closed dungeons in the search results, these have been ignored
@@ -37,7 +37,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		@foreach (var item in Model.OrderByDescending(d => d.Upvotes - d.Downvotes).Where(d => d.Closedvotes == 0))
+		@foreach (var item in Model.OrderByDescending(d => d.Upvotes - (d.Downvotes + d.Closedvotes)).ThenByDescending(d => d.Updated).Where(d => d.Closedvotes < 3))
 		{
 			<tr>
 				<td><a href="/dungeon/viewglyph/@item.Glyph">@item.Glyph</a></td>
@@ -68,15 +68,24 @@
 						}
 
 						bool newGlyph = item.Upvotes == 1 && item.Downvotes == 0;
+						bool hasClosedVotes = item.Closedvotes > 0;
 					}
 
 					<div class="item">
 						<div class="content">
 							<span class="@ratingClass">@ratingString</span>
+
 							@if (ratio == 1.0 && newGlyph == false)
 							{
 								<a href="#" data-tooltip="Dungeon has a perfect rating">
 									<i class="perfectRating star icon"></i>
+								</a>
+							}
+
+							@if (hasClosedVotes)
+							{
+								<a href="#" data-tooltip="There are closed votes for this dungeon. If enough closed votes are registered, this dungeon will be hidden">
+									<i class="lowRating warning sign icon"></i>
 								</a>
 							}
 						</div>
@@ -87,3 +96,23 @@
 		}
 	</tbody>
 </table>
+
+
+<div class="ui fluid accordion">
+	<div class="title">
+		<i class="dropdown icon"></i>
+		Icon Legend
+	</div>
+	<div class="content">
+		<ul>
+			<li><i class="perfectRating star icon"></i> Perfect Rating: All upvotes and 0 downvotes. Exception glyphs that have +1/-0</li>
+			<li><i class="lowRating warning sign icon"></i> Closed Warning: Dungeon has at least 1 closed vote. After 2 confirmation votes, this dungeon will be excluded from the search results</li>
+		</ul>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$(".accordion").accordion();
+	});
+</script>

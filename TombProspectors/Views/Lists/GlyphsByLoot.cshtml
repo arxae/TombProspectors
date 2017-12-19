@@ -4,7 +4,11 @@
 	ViewBag.Title = "Loot";
 }
 
-<div class="ui message">
+<div class="ui blurring message segment">
+	<div class="ui dimmer">
+		<div class="ui indeterminate text loader">Loading Results</div>
+	</div>
+
 	<div class="header">Find glyphs by Loot</div>
 	<p>
 		<select id="lootSelector" class="ui fluid selection search dropdown">
@@ -23,13 +27,14 @@
 
 @section Script {
 	<script type="text/javascript">
-		var partialLink = '@Url.Action("LoadGlyphsByLoot", "lists", new { lootId= "changeme"})';
 		$(document).ready(function () {
 			$("#lootSelector").dropdown("setting", "onChange", function (lootId) {
-				var link = partialLink.replace("changeme", lootId);
+				$(".segment").dimmer("show");
+				var link = "/lists/LoadGlyphsByLoot?lootId=" + lootId;
 
 				$.get(link, function (data) {
 					$("#resultsAnchor").html(data);
+					$(".segment").dimmer("hide");
 				});
 			});
 		});
