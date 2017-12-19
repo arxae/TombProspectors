@@ -55,7 +55,22 @@
 	</div>
 </div>
 
-@if (Model.Dungeon.ClosedVotes > 2)
+@if (Model.Dungeon.ClosedVotes > 0 && Model.Dungeon.ClosedVotes < 3)
+{
+	<div class="ui error icon message" style="margin-top:0px;">
+		<i class="warning sign icon"></i>
+		<div class="content">
+			<div class="header">
+				Warning
+			</div>
+			@{ 
+				var diff = 3 - Model.Dungeon.ClosedVotes;
+			}
+			<p> This dungeon currently has @Model.Dungeon.ClosedVotes closed. After @diff  more confirmation votes, the dungeon will be marked as closed</p>
+		</div>
+	</div>
+}
+else if (Model.Dungeon.ClosedVotes > 2)
 {
 	<div class="ui error icon message" style="margin-top:0px;">
 		<i class="warning sign icon"></i>
@@ -257,12 +272,11 @@
 
 		$("#admDeleteGlyphBtn").on("click", function () {
 			var glyph = $("#dungData").data("glyph");
+					$("#admDeleteGlyphBtn").addClass("disabled");
 
 			alertify.confirm("Confirm", "Are you sure you want to delete the glyph " + glyph,
 				function () {
 					// Yes
-					$("#admDeleteGlyphBtn").addClass("disabled");
-
 					$.ajax({
 						type: "POST",
 						url: "/administration/deleteglyph",
@@ -279,7 +293,36 @@
 						}
 					});
 				},
-				function () { }).set("labels", { ok: "Yes", cancel: "No" });
+				function () {
+					// No
+					$("#admDeleteGlyphBtn").removeClass("disabled");
+				}).set("labels", { ok: "Yes", cancel: "No" });
+		});
+
+		$("#admRebuildVotesBtn").on("click", function () {
+			var glyph = $("#dungData").data("glyph");
+			$("#admRebuildVotesBtn").addClass("disabled");
+
+			alertify.confirm("Confirm", "Are you sure you want to rebuild the votes of glyph " + glyph,
+				function () {
+					// Yes
+					$.ajax({
+						type: "POST",
+						url: "/administration/rebuildglyphvotes",
+						headers: {
+							"Accept": "application/json",
+							"Content-Type": "application/json"
+						},
+						data: JSON.stringify(glyph),
+						success: function (e) {
+							window.location.reload(true);
+						}
+					});
+				},
+				function () {
+					// No
+					$("#admRebuildVotesBtn").removeClass("disabled");
+				}).set("labels", { ok: "Yes", cancel: "No" });
 		});
 	</script>
 }

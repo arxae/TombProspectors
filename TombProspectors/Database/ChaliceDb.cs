@@ -281,7 +281,7 @@
 		{
 			using (var db = new ChaliceDb())
 			{
-				var result = db.Query<int>($"WITH Votes (Up, Down, Closed) AS (SELECT COALESCE(SUM(CASE WHEN [Value] = 'up' THEN 1 ELSE 0 END), 1) AS Up, COALESCE(SUM(CASE WHEN [Value] = 'down' THEN 1 ELSE 0 END), 0) AS Down, COALESCE(SUM(CASE WHEN [VALUE] = 'closed' THEN 1 ELSE 0 END), 0) AS Closed FROM UserHistory WHERE [Target] = '{glyph}' AND [Action] = 'vote') UPDATE DungeonGlyphs SET Upvotes = (SELECT Up FROM Votes), Downvotes = (SELECT Down FROM Votes), Closedvotes = (SELECT Closed FROM Votes) WHERE Glyph = '{glyph}'");
+				var result = db.Query<int>($"WITH Votes (Up, Down, Closed) AS (SELECT COALESCE(SUM(CASE WHEN [Value] = 'up' THEN 1 ELSE 0 END), 1) AS Up, COALESCE(SUM(CASE WHEN [Value] = 'down' THEN 1 ELSE 0 END), 0) AS Down, COALESCE(SUM(CASE WHEN [VALUE] = 'closed' THEN 1 ELSE 0 END), 0) AS Closed FROM UserHistory WHERE [Target] = '{glyph}' AND [Action] = 'vote') UPDATE DungeonGlyphs SET Upvotes = (SELECT CASE WHEN Up = 0 THEN 1 ELSE Up END FROM Votes), Downvotes = (SELECT Down FROM Votes), Closedvotes = (SELECT Closed FROM Votes) WHERE Glyph = '{glyph}'");
 			}
 		}
 

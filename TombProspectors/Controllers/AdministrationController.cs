@@ -60,17 +60,33 @@
 			}
 
 			// Delete glyph and associated history items (created + votes)
-			//using (var db = new ChaliceDb())
-			//{
-			//	db.BeginTransaction();
+			using (var db = new ChaliceDb())
+			{
+				db.BeginTransaction();
 
-			//	db.DungeonGlyphs.Delete(d => d.Glyph == glyphId);
-			//	db.UserHistory.Delete(h => h.Target == glyphId);
+				db.DungeonGlyphs.Delete(d => d.Glyph == glyphId);
+				db.UserHistory.Delete(h => h.Target == glyphId);
 
-			//	db.CommitTransaction();
-			//}
+				db.CommitTransaction();
+			}
 
 			return Ok("deleted");
+		}
+
+		[Authorize]
+		[HttpPost]
+		public IActionResult RebuildGlyphVotes([FromBody] string glyphId)
+		{
+			if (UserHasAdminRoles() == false) return View("_Error", "You are not authorized to do this");
+
+			ChaliceDb.RebuildGlyphVotes(glyphId);
+
+			return Ok("rebuild");
+		}
+
+		public bool UserHasAdminRoles()
+		{
+			return User.HasClaim(c => c.Value == "admin" || c.Value == "mod");
 		}
 
 		public class HomePageItem
