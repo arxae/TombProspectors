@@ -1,4 +1,5 @@
-﻿using SixLabors.ImageSharp;
+﻿using Microsoft.AspNetCore.Http;
+using SixLabors.ImageSharp;
 
 namespace TombProspectors.Controllers
 {
@@ -13,6 +14,8 @@ namespace TombProspectors.Controllers
 	using Database;
 	using Database.Models;
 	using Models;
+
+	using FileIo = System.IO.File;
 
 	public class DungeonController : Controller
 	{
@@ -132,6 +135,18 @@ namespace TombProspectors.Controllers
 				model.Lists.Loot = db.Loot.OrderBy(l => l.ItemName).ToList();
 			}
 
+			string ssDirPath = Path.Combine("wwwroot", "Screenshots", glyph);
+			if (Directory.Exists(ssDirPath))
+			{
+				string[] files = Directory.GetFiles(ssDirPath);
+
+				foreach (var file in files)
+				{
+					var fileName = Path.GetFileName(file);
+					model.Screenshots.Add(fileName);
+				}
+			}
+
 			ViewBag.CurrentGlyph = model.Dungeon.Glyph;
 
 			return View("EditGlyph", model);
@@ -168,7 +183,7 @@ namespace TombProspectors.Controllers
 					using (var img = Image.Load<Rgba32>(file.OpenReadStream()))
 					{
 						// Main image
-						using (var output = System.IO.File.OpenWrite(filePath))
+						using (var output = FileIo.OpenWrite(filePath))
 						{
 							if (img.Width > 1920 || img.Height > 1080)
 							{
@@ -179,7 +194,7 @@ namespace TombProspectors.Controllers
 						}
 
 						// Thumbnail
-						using (var output = System.IO.File.OpenWrite(thumbPath))
+						using (var output = FileIo.OpenWrite(thumbPath))
 						{
 							img.Mutate(i => i.Resize(256, 128));
 							img.SaveAsPng(output);
@@ -206,6 +221,32 @@ namespace TombProspectors.Controllers
 			var sanitizer = new Ganss.XSS.HtmlSanitizer();
 			glp.Submitter = HttpContext.User.Identity.Name;
 			glp.Notes = sanitizer.Sanitize(glp.Notes);
+
+			string ssDirPath = Path.Combine("wwwroot", "Screenshots", glp.DungeonGlyph);
+			if (glp.DeletedImages != null)
+			{
+				var ids = glp.DeletedImages.Split(';');
+				foreach (var id in ids)
+				{
+					var mainFile = Path.Combine(ssDirPath, $"{id}.png");
+					var thumbFile = Path.Combine(ssDirPath, $"{id}-thumb.png");
+
+					if (FileIo.Exists(mainFile)) FileIo.Delete(mainFile);
+					if (FileIo.Exists(thumbFile)) FileIo.Delete(thumbFile);
+				}
+			}
+
+			if (glp.Screenshots != null && glp.Screenshots.Count > 0)
+			{
+				string[] validFileTypes = { "image/jpeg", "image/gif", "image/png" };
+				foreach (var file in glp.Screenshots)
+				{
+					if (file.Length <= 0) continue;
+					if(validFileTypes.Contains(file.ContentType)==false)continue; // Skip when file is not a supported imagetype
+
+					SaveImage(glp.DungeonGlyph, file);
+				}
+			}
 
 			ChaliceDb.UpdateGlyphFromModel(glp);
 
@@ -325,6 +366,40 @@ namespace TombProspectors.Controllers
 			ViewBag.SearchType = searchType;
 
 			return View(model);
+		}
+
+		void SaveImage(string glyph, IFormFile file)
+		{
+			string ssDirPath = Path.Combine("wwwroot", "Screenshots", glyph);
+
+			if (Directory.Exists(ssDirPath) == false)
+			{
+				Directory.CreateDirectory(ssDirPath);
+			}
+
+			string filePath = Path.Combine(ssDirPath, $"{System.Guid.NewGuid():N}.png");
+			string thumbPath = Path.Combine(ssDirPath, $"{System.Guid.NewGuid():N}-thumb.png");
+
+			using (var img = Image.Load<Rgba32>(file.OpenReadStream()))
+			{
+				// Main Image
+				using (var output = FileIo.OpenWrite(filePath))
+				{
+					if (img.Width > 1920 || img.Height > 1080)
+					{
+						img.Mutate(i => i.Resize(1920, 1080));
+					}
+
+					img.SaveAsPng(output);
+				}
+
+				// Thumbnail
+				using (var output = FileIo.OpenWrite(thumbPath))
+				{
+					img.Mutate(i => i.Resize(256, 128));
+					img.SaveAsPng(output);
+				}
+			}
 		}
 
 		#region Models
