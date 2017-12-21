@@ -159,49 +159,15 @@ namespace TombProspectors.Controllers
 			glyph.Submitter = HttpContext.User.Identity.Name;
 			glyph.Notes = sanitizer.Sanitize(glyph.Notes);
 
-			if (glyph.Screenshots != null)
+			if (glyph.Screenshots != null && glyph.Screenshots.Count > 0)
 			{
 				string[] validFileTypes = { "image/jpeg", "image/gif", "image/png" };
-				int index = 0;
 				foreach (var file in glyph.Screenshots)
 				{
-					if (file.Length <= 0) continue;
-
-					string ssDirPath = Path.Combine("wwwroot", "Screenshots", glyph.DungeonGlyph);
-					if (Directory.Exists(ssDirPath) == false)
-					{
-						Directory.CreateDirectory(ssDirPath);
-					}
-
-					// Save image
-					// Skip when not a image file
+					if (file.Length < 0) continue;
 					if (validFileTypes.Contains(file.ContentType) == false) continue;
 
-					string filePath = Path.Combine(ssDirPath, $"{index}.png");
-					string thumbPath = Path.Combine(ssDirPath, $"{index}-thumb.png");
-
-					using (var img = Image.Load<Rgba32>(file.OpenReadStream()))
-					{
-						// Main image
-						using (var output = FileIo.OpenWrite(filePath))
-						{
-							if (img.Width > 1920 || img.Height > 1080)
-							{
-								img.Mutate(i => i.Resize(1920, 1080));
-							}
-
-							img.SaveAsPng(output);
-						}
-
-						// Thumbnail
-						using (var output = FileIo.OpenWrite(thumbPath))
-						{
-							img.Mutate(i => i.Resize(256, 128));
-							img.SaveAsPng(output);
-						}
-					}
-
-					index++;
+					SaveImage(glyph.DungeonGlyph, file);
 				}
 			}
 
@@ -242,7 +208,7 @@ namespace TombProspectors.Controllers
 				foreach (var file in glp.Screenshots)
 				{
 					if (file.Length <= 0) continue;
-					if(validFileTypes.Contains(file.ContentType)==false)continue; // Skip when file is not a supported imagetype
+					if (validFileTypes.Contains(file.ContentType) == false) continue; // Skip when file is not a supported imagetype
 
 					SaveImage(glp.DungeonGlyph, file);
 				}
@@ -377,8 +343,9 @@ namespace TombProspectors.Controllers
 				Directory.CreateDirectory(ssDirPath);
 			}
 
-			string filePath = Path.Combine(ssDirPath, $"{System.Guid.NewGuid():N}.png");
-			string thumbPath = Path.Combine(ssDirPath, $"{System.Guid.NewGuid():N}-thumb.png");
+			string Id = System.Guid.NewGuid().ToString("N");
+			string filePath = Path.Combine(ssDirPath, $"{Id}.png");
+			string thumbPath = Path.Combine(ssDirPath, $"{Id}-thumb.png");
 
 			using (var img = Image.Load<Rgba32>(file.OpenReadStream()))
 			{
