@@ -124,11 +124,11 @@
 					{
 						switch (r)
 						{
-							case "fetid": glyphsQuery = glyphsQuery.Where(g => g.Fetid == true); break;
-							case "rotted": glyphsQuery = glyphsQuery.Where(g => g.Rotted == true); break;
-							case "cursed": glyphsQuery = glyphsQuery.Where(g => g.Cursed == true); break;
-							case "sinister": glyphsQuery = glyphsQuery.Where(g => g.Sinister == true); break;
-							case "saveedit": glyphsQuery = glyphsQuery.Where(g => g.SaveEdited == true); break;
+							case "fetid": glyphsQuery = glyphsQuery.Where(g => g.Fetid); break;
+							case "rotted": glyphsQuery = glyphsQuery.Where(g => g.Rotted); break;
+							case "cursed": glyphsQuery = glyphsQuery.Where(g => g.Cursed); break;
+							case "sinister": glyphsQuery = glyphsQuery.Where(g => g.Sinister); break;
+							case "saveedit": glyphsQuery = glyphsQuery.Where(g => g.SaveEdited); break;
 						}
 					}
 				}

@@ -3,7 +3,7 @@
 }
 
 <!DOCTYPE html>
-<html class="no-js" lang="en">
+<html lang="en">
 
 <head>
 	<meta charset="utf-8" />
@@ -136,11 +136,11 @@
 
 		// Split that removes empty entries
 		String.prototype.split2 = function (delimiter) {
-			if (typeof (delimiter) === undefined) {
-				return [this]
+			if (typeof (delimiter) === "undefined") {
+				return [this];
 			}
 
-			return this.split(delimiter).filter(function (e) { return e.length != 0 });
+			return this.split(delimiter).filter(function (e) { return e.length !== 0 });
 		}
 	</script>
 

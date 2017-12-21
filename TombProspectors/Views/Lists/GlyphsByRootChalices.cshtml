@@ -64,7 +64,7 @@
 		$(document).ready(function () {
 			$("#chaliceSearchBtn").on("click", function () {
 				var dropdownVal = $("#chaliceSelector").dropdown("get value");
-				if (dropdownVal.length == 0) {
+				if (dropdownVal.length === 0) {
 					alert("Error", "Please select a chalice first");
 					return;
 				}
@@ -77,7 +77,7 @@
 				if ($("#sinisterCh").prop("checked")) { rites.push("sinister"); }
 				if ($("#saveEditedCh").prop("checked")) { rites.push("saveedit"); }
 
-				if (rites.length == 0) {
+				if (rites.length === 0) {
 					rites.push("all");
 				}
 

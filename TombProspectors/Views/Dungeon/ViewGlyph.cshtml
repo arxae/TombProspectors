@@ -33,11 +33,11 @@
 	<div class="value">
 		@if (Model.Dungeon.ClosedVotes > 2)
 		{
-			<span class="upvoteData">-</span> @Html.Raw("/"); <span class="downvoteData">-</span>
+			<span class="upvoteData">-</span> @Html.Raw("/") <span class="downvoteData">-</span>
 		}
 		else
 		{
-			<span class="upvoteData">+@Model.Dungeon.Upvotes</span> @Html.Raw("/"); <span class="downvoteData">-@Model.Dungeon.Downvotes</span>
+			<span class="upvoteData">+@Model.Dungeon.Upvotes</span> @Html.Raw("/") <span class="downvoteData">-@Model.Dungeon.Downvotes</span>
 		}
 	</div>
 	<div class="label">
@@ -58,7 +58,7 @@
 
 @if (Model.Dungeon.ClosedVotes > 0 && Model.Dungeon.ClosedVotes < 3)
 {
-	<div class="ui error icon message" style="margin-top:0px;">
+	<div class="ui error icon message" style="margin-top:0;">
 		<i class="warning sign icon"></i>
 		<div class="content">
 			<div class="header">
@@ -73,7 +73,7 @@
 }
 else if (Model.Dungeon.ClosedVotes > 2)
 {
-	<div class="ui error icon message" style="margin-top:0px;">
+	<div class="ui error icon message" style="margin-top:0;">
 		<i class="warning sign icon"></i>
 		<div class="content">
 			<div class="header">
@@ -313,7 +313,7 @@ else if (Model.Dungeon.ClosedVotes > 2)
 							"Content-Type": "application/json"
 						},
 						data: JSON.stringify(glyph),
-						success: function (e) {
+						success: function () {
 							window.location.reload(true);
 						}
 					});
