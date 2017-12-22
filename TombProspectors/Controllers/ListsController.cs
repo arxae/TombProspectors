@@ -31,7 +31,7 @@
 			{
 				var glyphs = db
 					.Query<DungeonGlyph>(
-						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Loot) + ';') LIKE '%;{lootId};%'")
+						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Upvotes, Downvotes, Closedvotes, Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Loot) + ';') LIKE '%;{lootId};%'")
 					.ToList();
 
 				foreach (var g in glyphs)
@@ -74,7 +74,7 @@
 			{
 				var glyphs = db
 					.Query<DungeonGlyph>(
-						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Bosses) + ';') LIKE '%;{bossId};%'")
+						$"SELECT Glyph, ShortDescription, RootChalice, Submitter, Upvotes, Downvotes, Closedvotes Updated FROM DungeonGlyphs WHERE(',' + RTRIM(Bosses) + ';') LIKE '%;{bossId};%'")
 					.ToList();
 
 				foreach (var g in glyphs)
@@ -124,11 +124,11 @@
 					{
 						switch (r)
 						{
-							case "fetid": glyphsQuery = glyphsQuery.Where(g => g.Fetid == true); break;
-							case "rotted": glyphsQuery = glyphsQuery.Where(g => g.Rotted == true); break;
-							case "cursed": glyphsQuery = glyphsQuery.Where(g => g.Cursed == true); break;
-							case "sinister": glyphsQuery = glyphsQuery.Where(g => g.Sinister == true); break;
-							case "saveedit": glyphsQuery = glyphsQuery.Where(g => g.SaveEdited == true); break;
+							case "fetid": glyphsQuery = glyphsQuery.Where(g => g.Fetid); break;
+							case "rotted": glyphsQuery = glyphsQuery.Where(g => g.Rotted); break;
+							case "cursed": glyphsQuery = glyphsQuery.Where(g => g.Cursed); break;
+							case "sinister": glyphsQuery = glyphsQuery.Where(g => g.Sinister); break;
+							case "saveedit": glyphsQuery = glyphsQuery.Where(g => g.SaveEdited); break;
 						}
 					}
 				}

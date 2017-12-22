@@ -186,7 +186,7 @@
 					},
 					Bosses: {
 						identifier: "Bosses",
-						rules: [{ type: "minCount[1]", primpt: "You need to select at least 1 boss" }]
+						rules: [{ type: "minCount[1]", prompt: "You need to select at least 1 boss" }]
 					},
 					Loot: {
 						identifier: "Loot",
@@ -215,6 +215,8 @@
 					return false;
 				}
 			}
+
+			return true;
 		}
 	</script>
 }

@@ -1,0 +1,79 @@
+﻿@model List<TombProspectors.Database.Models.User>
+@{
+	Layout = "_Layout";
+	ViewBag.Title = "User Management";
+}
+
+<table class="ui table">
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>User</th>
+			<th>Registered</th>
+			<th>Role</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var user in Model.OrderBy(u => u.Id))
+		{
+			<tr>
+				<td>@user.Id</td>
+				<td>@user.UserName</td>
+				<td>@user.Created</td>
+				<td>
+					@switch (user.Role)
+					{
+						case "user":
+							<span>User</span>
+							break;
+
+						case "moderator":
+							<span>Moderator</span>
+							break;
+
+						case "admin":
+							<span>Administrator</span>
+							break;
+					}
+				</td>
+				<td>
+					@if (user.Role != "admin")
+					{
+						<a href="#" class="btnDeleteUser" data-userid="@user.Id" data-username="@user.UserName" data-tooltip="Delete User"><i class="trash outline icon"></i></a>
+					}
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+@section Script {
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$(".btnDeleteUser").on("click", function () {
+				var id = $(this).data("userid");
+				var name = $(this).data("username");
+
+				console.log(id);
+				alertify.confirm("Confirm", "Are you sure you want to delete user <b>" + name + "</b>?",
+					function () {
+						// Yes
+						$.ajax({
+							type: "POST",
+							url: "/administration/deleteuser",
+							headers: {
+								"Accept": "application/json",
+								"Content-Type": "application/json"
+							},
+							data: JSON.stringify(id),
+							success: function () {
+								window.location.reload(true);
+							}
+						});
+					}, function () { /* No */ })
+					.set("labels", { ok: "Yes", cancel: "No" });
+			});
+		});
+	</script>
+}

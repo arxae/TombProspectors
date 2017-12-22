@@ -6,123 +6,152 @@
 
 <h1>Edditing @Model.Dungeon.Glyph</h1>
 
-<form id="newGlyphForm" class="ui form" action="/dungeon/SubmitGlyphEdit" method="post">
-	<input type="hidden" name="DungeonGlyph" value="@Model.Dungeon.Glyph" />
-
-	<div class="field">
-		<label>Short Description</label>
-		<input type="text" name="ShortDescription" placeholder="Short Description" value="@Model.Dungeon.ShortDescription" />
-	</div>
-
-	<div class="two fields">
-		<div class="field">
-			<div class="ui selection dropdown" id="rootChaliceDropdown">
-				<input type="hidden" name="RootChalice">
-				<i class="dropdown icon"></i>
-				<div class="default text">Root Chalice</div>
-				<div class="menu">
-					@foreach (var chalice in Model.Lists.RootChalices)
+<form id="editGlyphForm" class="ui form" action="/dungeon/SubmitGlyphEdit" method="post" enctype="multipart/form-data">
+<div class="ui error message"></div>
+	<div class="ui">
+		<div class="ui right close rail">
+			<div class="ui">
+				Click to remove screenshots:
+				@foreach (var img in Model.Screenshots)
+				{
+					if (img.EndsWith("-thumb.png"))
 					{
-						if (chalice.ChaliceId == Model.Dungeon.RootChalice)
-						{
-							<div class="item selected" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
-						}
-						else
-						{
-							<div class="item" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
-						}
+						<div id="imgPreview-@img.Replace("-thumb.png", "")">
+							<img class="ui image" src="~/Screenshots/@Model.Dungeon.Glyph/@img" />
+							<a class="circular ui icon small basic negative button removeGlyph" data-imgid="@img.Replace("-thumb.png", "")" data-tooltip="Remove Screenshot" style="margin-top:0.25em;">
+								<i class="icon trash"></i>
+							</a>
+
+							<div class="ui divider"></div>
+						</div>
 					}
+				}
+			</div>
+		</div>
+		<input type="hidden" name="DungeonGlyph" value="@Model.Dungeon.Glyph" />
+
+		<div class="field">
+			<label>Short Description</label>
+			<input type="text" name="ShortDescription" placeholder="Short Description" value="@Model.Dungeon.ShortDescription" />
+		</div>
+
+		<div class="two fields">
+			<div class="field">
+				<div class="ui selection dropdown" id="rootChaliceDropdown">
+					<input type="hidden" name="RootChalice">
+					<i class="dropdown icon"></i>
+					<div class="default text">Root Chalice</div>
+					<div class="menu">
+						@foreach (var chalice in Model.Lists.RootChalices)
+						{
+							if (chalice.ChaliceId == Model.Dungeon.RootChalice)
+							{
+								<div class="item selected" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
+							}
+							else
+							{
+								<div class="item" data-value="@chalice.ChaliceId">@chalice.ChaliceName</div>
+							}
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="field">
+				<div class="ui selection dropdown" id="layersDropdown">
+					<input type="hidden" name="Layers">
+					<i class="dropdown icon"></i>
+					<div class="default text">Layers</div>
+					<div class="menu">
+						<div class="item" data-value="1">1</div>
+						<div class="item" data-value="2">2</div>
+						<div class="item" data-value="3">3</div>
+						<div class="item" data-value="4">4</div>
+						<div class="item" data-value="5">5</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="inline fields">
+			<label>Additional Rites</label>
+			<div class="field">
+				<div id="fetidChUi" class="ui checkbox">
+					<input type="checkbox" id="fetidCh" />
+					@Html.Hidden("Fetid")
+					<label>Fetid</label>
+				</div>
+			</div>
+			<div class="field">
+				<div id="rottedChUi" class="ui checkbox">
+					<input type="checkbox" id="rottedCh">
+					@Html.Hidden("Rotted")
+					<label>Rotted</label>
+				</div>
+			</div>
+			<div class="field">
+				<div id="cursedChUi" class="ui checkbox">
+					<input type="checkbox" id="cursedCh">
+					@Html.Hidden("Cursed")
+					<label>Cursed</label>
+				</div>
+			</div>
+			<div class="field">
+				<div id="sinisterChUi" class="ui checkbox">
+					<input type="checkbox" id="sinisterCh">
+					@Html.Hidden("Sinister")
+					<label>Sinister</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="inline fields">
+			<label>Save Edited</label>
+			<div class="field">
+				<div id="saveEditedChUi" class="ui checkbox">
+					<input type="checkbox" id="saveEditedCh" />
+					@Html.Hidden("SaveEdited")
+					<label></label>
 				</div>
 			</div>
 		</div>
 
 		<div class="field">
-			<div class="ui selection dropdown" id="layersDropdown">
-				<input type="hidden" name="Layers">
-				<i class="dropdown icon"></i>
-				<div class="default text">Layers</div>
-				<div class="menu">
-					<div class="item" data-value="1">1</div>
-					<div class="item" data-value="2">2</div>
-					<div class="item" data-value="3">3</div>
-					<div class="item" data-value="4">4</div>
-					<div class="item" data-value="5">5</div>
-				</div>
-			</div>
+			<select id="bossDropdown" name="Bosses" class="ui fluid search dropdown" multiple>
+				<option value="">Bosses</option>
+				@foreach (var boss in Model.Lists.Bosses)
+				{
+					<option value="@boss.Id">@boss.BossName</option>
+				}
+			</select>
 		</div>
-	</div>
 
-	<div class="inline fields">
-		<label>Additional Rites</label>
 		<div class="field">
-			<div id="fetidChUi" class="ui checkbox">
-				<input type="checkbox" id="fetidCh" />
-				@Html.Hidden("Fetid")
-				<label>Fetid</label>
-			</div>
+			<label>Noteable Loot (Specifics can be mentioned in the notes, allows additions)</label>
+			<select id="lootDropdown" name="Loot" class="ui fluid search dropdown allowAdditions" multiple>
+				<option value="">Notable loot (Specifics can be mentioned in the notes, allows additions)</option>
+				@foreach (var loot in Model.Loot)
+				{
+					<option value="@loot.Id">@loot.ItemName</option>
+				}
+			</select>
 		</div>
+		
 		<div class="field">
-			<div id="rottedChUi" class="ui checkbox">
-				<input type="checkbox" id="rottedCh">
-				@Html.Hidden("Rotted")
-				<label>Rotted</label>
-			</div>
+			<label>Add Screenshots</label>
+			<input id="screenshotInput" type="file" name="Screenshots" accept=".jpg,.jpeg,.png,.gif" multiple />
 		</div>
+
 		<div class="field">
-			<div id="cursedChUi" class="ui checkbox">
-				<input type="checkbox" id="cursedCh">
-				@Html.Hidden("Cursed")
-				<label>Cursed</label>
-			</div>
+			<label>Notes</label>
+			<textarea rows="5" name="Notes" placeholder="Notes">@Model.Dungeon.Notes</textarea>
 		</div>
-		<div class="field">
-			<div id="sinisterChUi" class="ui checkbox">
-				<input type="checkbox" id="sinisterCh">
-				@Html.Hidden("Sinister")
-				<label>Sinister</label>
-			</div>
-		</div>
+
+		<button class="ui button positive" type="submit">Save changes</button>
+		<a class="ui button negative" href="/dungeon/viewglyph/@Model.Dungeon.Glyph">Cancel</a>
 	</div>
 
-	<div class="inline fields">
-		<label>Save Edited</label>
-		<div class="field">
-			<div id="saveEditedChUi" class="ui checkbox">
-				<input type="checkbox" id="saveEditedCh" />
-				@Html.Hidden("SaveEdited")
-				<label></label>
-			</div>
-		</div>
-	</div>
-
-	<div class="field">
-		<select id="bossDropdown" name="Bosses" class="ui fluid search dropdown" multiple>
-			<option value="">Bosses</option>
-			@foreach (var boss in Model.Lists.Bosses)
-			{
-				<option value="@boss.Id">@boss.BossName</option>
-			}
-		</select>
-	</div>
-
-	<div class="field">
-		<label>Noteable Loot (Specifics can be mentioned in the notes, allows additions)</label>
-		<select id="lootDropdown" name="Loot" class="ui fluid search dropdown allowAdditions" multiple>
-			<option value="">Notable loot (Specifics can be mentioned in the notes, allows additions)</option>
-			@foreach (var loot in Model.Loot)
-			{
-				<option value="@loot.Id">@loot.ItemName</option>
-			}
-		</select>
-	</div>
-
-	<div class="field">
-		<label>Notes</label>
-		<textarea rows="5" name="Notes" placeholder="Notes">@Model.Dungeon.Notes</textarea>
-	</div>
-
-	<button class="ui button positive" type="submit">Save changes</button>
-	<a class="ui button negative" href="/dungeon/viewglyph/@Model.Dungeon.Glyph">Cancel</a>
+	<input name="DeletedImages" type="hidden" />
 </form>
 
 <input id="editData" type="hidden"
@@ -138,6 +167,9 @@
 
 @section Script {
 	<script type="text/javascript">
+		var deletedScreenshots = [];
+		var validImages = false;
+
 		$(document).ready(function () {
 			$(".ui.dropdown").dropdown();
 
@@ -167,10 +199,92 @@
 					return;
 				}
 			});
-		});		
+
+			$(".removeGlyph").on("click", function() {
+				var imgId = $(this).data("imgid");
+				
+				// Track which images have been deleted
+				deletedScreenshots.push(imgId);
+
+				// Delete from edit view
+				$("#imgPreview-" + imgId).remove();
+
+				// Update Input
+				$("[Name=DeletedImages]").val(deletedScreenshots.toString().replace(/,/g, ";"));
+			});
+
+			// Validation
+			$("#editGlyphForm")
+				.form({
+					on: "blur",
+					fields: {
+						DungeonGlyph: {
+							identifier: "DungeonGlyph",
+							rules: [{ type: "exactLength[8]" }]
+						},
+						ShortDescription: {
+							identifier: "ShortDescription",
+							rules: [{ type: "minLength[5]" }]
+						},
+						Bosses: {
+							identifier: "Bosses",
+							rules: [{ type: "minCount[1]", prompt: "You need to select at least 1 boss" }]
+						},
+						Loot: {
+							identifier: "Loot",
+							rules: [{ type: "minCount[1]", prompt: "You need to select at least 1 piece of loot" }]
+						},
+						RootChalice: {
+							identifier: "RootChalice",
+							rules: [{ type: "empty", prompt: "You need to select a root chalice" }]
+						},
+						Layers: {
+							identifier: "Layers",
+							rules: [{ type: "empty", prompt: "Please select the amount of layers" }]
+						}
+					}
+				});
+
+			$("#editGlyphForm").submit(function(e) {
+				if($("#editGlyphForm").form("is valid") === false) {
+					e.preventDefault();
+				}
+			});
+
+			$("#screenshotInput").on("change",
+				function () {
+					var valid = [];
+					for (var i = 0; i < this.files.length; i++) {
+						var file = this.files[i];
+						var fileType = file["type"];
+						if ($.inArray(fileType, ["image/jpeg", "image/gif", "image/png"]) < 0) {
+							valid.push(false);
+						} else {
+							valid.push(true);
+						}
+					}
+
+					validImages = allTrue(valid);
+
+					if (validImages === false) {
+						alert("Some selected files are not valid and will be ignored");
+					}
+				});
+		});
+
 
 		function getInitData(val) {
 			return $("#editData").data(val);
+		}
+
+		function allTrue(obj) {
+			for (var o in obj) {
+				if (obj[o] === false || obj[o] === "false") {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		// Sync checkboxes with hidden input field

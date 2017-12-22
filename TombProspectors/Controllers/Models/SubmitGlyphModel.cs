@@ -18,6 +18,7 @@
 		public string Notes { get; set; }
 		public string[] Loot { get; set; }
 		public string Submitter { get; set; }
+		public string DeletedImages { get; set; }
 		public List<IFormFile> Screenshots { get; set; }
 	}
 }

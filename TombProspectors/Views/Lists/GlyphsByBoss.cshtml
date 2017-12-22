@@ -4,7 +4,11 @@
 	ViewBag.Title = "Loot by Boss";
 }
 
-<div class="ui message">
+<div class="ui blurring message segment">
+	<div class="ui dimmer">
+		<div class="ui indeterminate text loader">Loading Results</div>
+	</div>
+
 	<div class="header">Find glyphs by Boss</div>
 	<p>
 		<select id="lootSelector" class="ui fluid selection search dropdown">
@@ -25,10 +29,12 @@
 	<script type="text/javascript">
 		$(document).ready(function () {
 			$("#lootSelector").dropdown("setting", "onChange", function (bossId) {
+				$(".segment").dimmer("show");
 				var link = "/lists/LoadGlyphsByboss?bossId=" + bossId;
 
 				$.get(link, function (data) {
 					$("#resultsAnchor").html(data);
+					$(".segment").dimmer("hide");
 				});
 			});
 		});

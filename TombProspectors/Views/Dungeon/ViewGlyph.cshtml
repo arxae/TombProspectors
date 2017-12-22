@@ -2,6 +2,7 @@
 @{
 	Layout = "_Layout";
 	ViewBag.Title = "View Glyphing: " + Model.Dungeon.Glyph;
+	var userRole = User.Claims.FirstOrDefault(c => c.Type == "role")?.Value;
 }
 
 @section Head {
@@ -22,21 +23,21 @@
 	</style>
 }
 
-<h1 class="ui huge sub header">
+<h2 class="ui huge header">
 	Viewing Glyph <i>@Model.Dungeon.Glyph</i>
-</h1>
+</h2>
 <span>@Model.Dungeon.ShortDescription</span>
 <br />
 
 <div class="ui mini statistic" style="margin-bottom:4px;">
 	<div class="value">
-		@if (Model.Dungeon.ClosedVotes > 0)
+		@if (Model.Dungeon.ClosedVotes > 2)
 		{
-			<span class="upvoteData">-</span> @Html.Raw("/"); <span class="downvoteData">-</span>
+			<span class="upvoteData">-</span> @Html.Raw("/") <span class="downvoteData">-</span>
 		}
 		else
 		{
-			<span class="upvoteData">+@Model.Dungeon.Upvotes</span> @Html.Raw("/"); <span class="downvoteData">-@Model.Dungeon.Downvotes</span>
+			<span class="upvoteData">+@Model.Dungeon.Upvotes</span> @Html.Raw("/") <span class="downvoteData">-@Model.Dungeon.Downvotes</span>
 		}
 	</div>
 	<div class="label">
@@ -55,15 +56,30 @@
 	</div>
 </div>
 
-@if (Model.Dungeon.ClosedVotes > 0)
+@if (Model.Dungeon.ClosedVotes > 0 && Model.Dungeon.ClosedVotes < 3)
 {
-	<div class="ui error icon message" style="margin-top:0px;">
+	<div class="ui error icon message" style="margin-top:0;">
 		<i class="warning sign icon"></i>
 		<div class="content">
 			<div class="header">
 				Warning
 			</div>
-			<p>At least one person voted this dungeon as no longer available. You can still vote, but votes and rating will no longer be displayed</p>
+			@{
+				var diff = 3 - Model.Dungeon.ClosedVotes;
+			}
+			<p> This dungeon currently has @Model.Dungeon.ClosedVotes closed. After @diff  more confirmation votes, the dungeon will be marked as closed</p>
+		</div>
+	</div>
+}
+else if (Model.Dungeon.ClosedVotes > 2)
+{
+	<div class="ui error icon message" style="margin-top:0;">
+		<i class="warning sign icon"></i>
+		<div class="content">
+			<div class="header">
+				Warning
+			</div>
+			<p> This dungeon currently has @Model.Dungeon.ClosedVotes. Votes will still be registered, but rating will not longer be available.</p>
 		</div>
 	</div>
 }
@@ -160,11 +176,6 @@
 		<span id="notesAnchor">@Model.Dungeon.Notes</span>
 	</div>
 
-	@if (User.Identity.Name == Model.Dungeon.Submitter)
-	{
-		<a href="/dungeon/edit/@Model.Dungeon.Glyph">Edit glyph</a>
-	}
-
 	<p style="color:darkgray;">
 		Submitted on <span class="submitData">@Model.Dungeon.Updated</span> by
 
@@ -180,19 +191,32 @@
 	</p>
 </div>
 <div class="ui bottom attached tab segment" data-tab="tab_images">
-	@foreach (var img in Model.Screenshots)
-	{
-		if (img.EndsWith("-thumb.png") == false)
+		@foreach (var img in Model.Screenshots)
 		{
-			<a href="~/Screenshots/@Model.Dungeon.Glyph/@img" class="screenshotThumb" data-fancybox data-options='{"animationEffect":"fade"}'>
-				<img src="~/Screenshots/@Model.Dungeon.Glyph/@img" height="128" widht="256" />
-			</a>
+			if (img.EndsWith("-thumb.png"))
+			{
+				<a href="~/Screenshots/@Model.Dungeon.Glyph/@img.Replace("-thumb.png", ".png")" class="screenshotThumb" data-fancybox data-options='{"animationEffect":"fade"}'>
+					<img src="~/Screenshots/@Model.Dungeon.Glyph/@img" height="128" width="256" />
+				</a>
+			}
 		}
-	}
 </div>
 <div class="ui bottom attached tab segment" data-tab="tab_comments">
 	<div id="commentsAnchor"></div>
 	<div id="commentsLoaderIndicator" class="ui active centered inline text loader">Getting comments</div>
+</div>
+
+<div class="ui buttons">
+	@if (userRole == "admin" || userRole == "moderator")
+	{
+		<button id="admDeleteGlyphBtn" class="ui button">Delete Glyph</button>
+		<button id="admRebuildVotesBtn" class="ui button">Rebuild Votes</button>
+	}
+
+	@if (User.Identity.Name == Model.Dungeon.Submitter)
+	{
+		<a class="ui button" href="/dungeon/edit/@Model.Dungeon.Glyph">Edit glyph</a>
+	}
 </div>
 
 <input id="dungData" type="hidden" data-glyph="@Model.Dungeon.Glyph" />
@@ -243,6 +267,61 @@
 					discussionLoaded = true;
 				});
 			}
+		});
+
+		$("#admDeleteGlyphBtn").on("click", function () {
+			var glyph = $("#dungData").data("glyph");
+			$("#admDeleteGlyphBtn").addClass("disabled");
+
+			alertify.confirm("Confirm", "Are you sure you want to delete the glyph " + glyph,
+				function () {
+					// Yes
+					$.ajax({
+						type: "POST",
+						url: "/administration/deleteglyph",
+						headers: {
+							"Accept": "application/json",
+							"Content-Type": "application/json"
+						},
+						data: JSON.stringify(glyph),
+						success: function (e) {
+							if (e === "deleted") {
+								alert(glyph + " has been deleted.");
+								window.location.href = "/";
+							}
+						}
+					});
+				},
+				function () {
+					// No
+					$("#admDeleteGlyphBtn").removeClass("disabled");
+				}).set("labels", { ok: "Yes", cancel: "No" });
+		});
+
+		$("#admRebuildVotesBtn").on("click", function () {
+			var glyph = $("#dungData").data("glyph");
+			$("#admRebuildVotesBtn").addClass("disabled");
+
+			alertify.confirm("Confirm", "Are you sure you want to rebuild the votes of glyph " + glyph,
+				function () {
+					// Yes
+					$.ajax({
+						type: "POST",
+						url: "/administration/rebuildglyphvotes",
+						headers: {
+							"Accept": "application/json",
+							"Content-Type": "application/json"
+						},
+						data: JSON.stringify(glyph),
+						success: function () {
+							window.location.reload(true);
+						}
+					});
+				},
+				function () {
+					// No
+					$("#admRebuildVotesBtn").removeClass("disabled");
+				}).set("labels", { ok: "Yes", cancel: "No" });
 		});
 	</script>
 }
